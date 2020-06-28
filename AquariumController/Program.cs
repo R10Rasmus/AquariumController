@@ -1,5 +1,10 @@
 ﻿using Lcd1602Controller;
+using Q42.HueApi;
+using Q42.HueApi.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
 using System.Threading;
 
 namespace AquariumController
@@ -8,10 +13,24 @@ namespace AquariumController
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("AquariumController is running");
+
+            int _temperatureMax = int.Parse(ConfigurationManager.AppSettings.Get("TemperatureMax"));
+            int _temperatureMin = int.Parse(ConfigurationManager.AppSettings.Get("TemperatureMin"));
 
             using (Lcd1602 lcd = new Lcd1602(registerSelectPin: 20, enablePin: 21, dataPins: new int[] { 26, 19, 13, 06 }, shouldDispose: true))
             {
+                ILocalHueClient client = new LocalHueClient(ConfigurationManager.AppSettings.Get("PhilipsHueIp"));
+                client.Initialize(ConfigurationManager.AppSettings.Get("PhilipsHuePersonalAppKey"));
+
+                IEnumerable<Light> lights = client.GetLightsAsync().GetAwaiter().GetResult();
+
+                foreach (Light item in lights)
+                {
+                    Console.WriteLine("name:" + item.Name + " id:" +item.Id);
+                }
+
+                Light aquariumHeater = lights.FirstOrDefault(t => t.Name == "AquariumHeater");
                 LcdConsole console = new LcdConsole(lcd, "A00", false)
                 {
                     LineFeedMode = LineWrapMode.Wrap,
@@ -19,19 +38,21 @@ namespace AquariumController
                 };
 
                 FishCharacters(lcd);
+                TemperatureCharacters(lcd);
                 lcd.SetCursorPosition(0, 0);
 
                 int _fishCount = 0; 
                 bool _revers = false;
                 int _positionCount = 0;
-
+                int _temperature = 0;
                 while (!Console.KeyAvailable)
                 {
-                    console.ReplaceLine(0, "Tempertur er 9");
+                    console.ReplaceLine(0, ConfigurationManager.AppSettings.Get("TemperatureText") + _temperature + (char)6);
                     ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
 
+                    HeaterControl(_temperatureMax, _temperatureMin, client, aquariumHeater, _temperature);
                 }
-             
+
                 console.Dispose();
 
             }
@@ -58,6 +79,27 @@ namespace AquariumController
             //}
 
             //controller.Dispose();
+        }
+
+        private static void HeaterControl(int _temperatureMax, int _temperatureMin, ILocalHueClient client, Light aquariumHeater, int _temperature)
+        {
+            //if the system has an heater
+            if (aquariumHeater != null)
+            {
+                //if temperature is over max, then turn off heater
+                if (_temperature > _temperatureMax)
+                {
+                    LightCommand lightCommand = new LightCommand() { On = false };
+                    client.SendCommandAsync(lightCommand, new List<string> { aquariumHeater.Id });
+                }
+
+                //if temperature is under min, then turn on heater
+                if (_temperature < _temperatureMin)
+                {
+                    LightCommand lightCommand = new LightCommand() { On = true };
+                    client.SendCommandAsync(lightCommand, new List<string> { aquariumHeater.Id });
+                }
+            }
         }
 
         private static void ShowFishOnLine2(LcdConsole console, ref int _fishCount, ref bool _revers, ref int _positionCount)
@@ -143,6 +185,21 @@ namespace AquariumController
         //    lcd.CreateCustomCharacter(1,
         //       Walk2);
         //}
+
+        private static void TemperatureCharacters(Lcd1602 lcd)
+        {
+            byte[] temperatureCharacters = new byte[8];
+            temperatureCharacters[0] = 0b_11000;
+            temperatureCharacters[1] = 0b_11000;
+            temperatureCharacters[2] = 0b_00011;
+            temperatureCharacters[3] = 0b_00100;
+            temperatureCharacters[4] = 0b_00100;
+            temperatureCharacters[5] = 0b_00100;
+            temperatureCharacters[6] = 0b_00011;
+            temperatureCharacters[7] = 0b_00000;
+
+            lcd.CreateCustomCharacter(6, temperatureCharacters);
+        }
 
         private static void FishCharacters(Lcd1602 lcd)
         {

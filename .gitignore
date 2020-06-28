@@ -3,3 +3,9 @@
 ################################################################################
 
 /.vs/AquariumController/v16
+/.vs
+/AquariumController/bin/Debug
+/AquariumController/obj/Debug
+/Lcd1602Controller/bin/Debug
+/Lcd1602Controller/obj/Debug
+/packages
