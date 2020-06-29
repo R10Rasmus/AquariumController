@@ -11,8 +11,11 @@ namespace AquariumController
 {
     class Program
     {
+        const int TemperatureCharactersNumber = 6;
+
         static void Main(string[] args)
         {
+           
             Console.WriteLine("AquariumController is running");
 
             int _temperatureMax = int.Parse(ConfigurationManager.AppSettings.Get("TemperatureMax"));
@@ -47,10 +50,11 @@ namespace AquariumController
                 int _temperature = 0;
                 while (!Console.KeyAvailable)
                 {
-                    console.ReplaceLine(0, ConfigurationManager.AppSettings.Get("TemperatureText") + _temperature + (char)6);
+                    console.ReplaceLine(0, ConfigurationManager.AppSettings.Get("TemperatureText") + _temperature + (char)TemperatureCharactersNumber);
+
                     ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
 
-                    HeaterControl(_temperatureMax, _temperatureMin, client, aquariumHeater, _temperature);
+                    HeaterControl(_temperatureMax, _temperatureMin, client, aquariumHeater, _temperature, console);
                 }
 
                 console.Dispose();
@@ -81,7 +85,7 @@ namespace AquariumController
             //controller.Dispose();
         }
 
-        private static void HeaterControl(int _temperatureMax, int _temperatureMin, ILocalHueClient client, Light aquariumHeater, int _temperature)
+        private static void HeaterControl(int _temperatureMax, int _temperatureMin, ILocalHueClient client, Light aquariumHeater, int _temperature, LcdConsole console)
         {
             //if the system has an heater
             if (aquariumHeater != null)
@@ -91,6 +95,7 @@ namespace AquariumController
                 {
                     LightCommand lightCommand = new LightCommand() { On = false };
                     client.SendCommandAsync(lightCommand, new List<string> { aquariumHeater.Id });
+                    console.BlinkDisplay(2);
                 }
 
                 //if temperature is under min, then turn on heater
@@ -198,7 +203,7 @@ namespace AquariumController
             temperatureCharacters[6] = 0b_00011;
             temperatureCharacters[7] = 0b_00000;
 
-            lcd.CreateCustomCharacter(6, temperatureCharacters);
+            lcd.CreateCustomCharacter(TemperatureCharactersNumber, temperatureCharacters);
         }
 
         private static void FishCharacters(Lcd1602 lcd)
