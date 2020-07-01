@@ -1,5 +1,6 @@
 ﻿using AquariumController.DB;
 using AquariumController.Display;
+using Iot.Device.OneWire;
 using Lcd1602Controller;
 using MySql.Data.MySqlClient;
 using Q42.HueApi;
@@ -17,7 +18,7 @@ namespace AquariumController
     {
       
 
-        static int _Tempertur = 0;
+        static double _Tempertur = 0;
 
         static void Main(string[] args)
         {
@@ -72,9 +73,9 @@ namespace AquariumController
 
                 while (!Console.KeyAvailable)
                 {
+                    _Tempertur = getTempertur(Helper.GetSettingFromDb(conn, "WaterTemperatureId"));
 
-                    string tempterturText = Helper.GetSettingFromDb(conn, "TemperatureText") + _Tempertur + (char)SetCharacters.TemperatureCharactersNumber;
-                    //Console.WriteLine(tempterturText);
+                    string tempterturText = Helper.GetSettingFromDb(conn, "TemperatureText") + (int)_Tempertur + (char)SetCharacters.TemperatureCharactersNumber;
 
                     console.ReplaceLine(0, tempterturText);
                     
@@ -82,6 +83,7 @@ namespace AquariumController
                     Thread.Sleep(1000);
 
                     HeaterControl(_temperatureMax, _temperatureMin, client, aquariumHeater, _Tempertur, console);
+
                 }
 
 
@@ -139,9 +141,21 @@ namespace AquariumController
 
         }
 
-       
+       private static double getTempertur(string TemperatureId)
+        {
+            // Quick and simple way to find a thermometer and print the temperature
+            foreach (var dev in OneWireThermometerDevice.EnumerateDevices())
+            {
+                if(dev.DeviceId == TemperatureId)
+                {
+                    return dev.ReadTemperature().DegreesCelsius;
+                }
+            }
 
-        private static void HeaterControl(int _temperatureMax, int _temperatureMin, ILocalHueClient client, Light aquariumHeater, int _temperature, LcdConsole console)
+            return 0;
+        }
+
+        private static void HeaterControl(int _temperatureMax, int _temperatureMin, ILocalHueClient client, Light aquariumHeater, double _temperature, LcdConsole console)
         {
             //if the system has an heater
             if (aquariumHeater != null)

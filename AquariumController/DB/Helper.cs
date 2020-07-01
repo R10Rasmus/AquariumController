@@ -1,10 +1,4 @@
 ﻿using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AquariumController.DB
 {
@@ -28,7 +22,7 @@ namespace AquariumController.DB
             return value;
         }
 
-        public static void SaveChannelValue(MySqlConnection conn, string channelName, int value)
+        public static void SaveChannelValue(MySqlConnection conn, string channelName, double value)
         {
 
             MySqlCommand cmd = new MySqlCommand
