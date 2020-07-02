@@ -1,4 +1,5 @@
 ﻿using InfoPages.Models;
+using Iot.Device.CpuTemperature;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System;
@@ -12,6 +13,7 @@ namespace InfoPages.Controllers
 {
     public class HomeController : Controller
     {
+        CpuTemperature cpuTemperature = new CpuTemperature();
         public ActionResult Index()
         {
             return View();
@@ -88,7 +90,6 @@ namespace InfoPages.Controllers
         public ActionResult Temperature()
         {
 
-
             return View();
         }
 
@@ -144,6 +145,17 @@ namespace InfoPages.Controllers
             JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
             return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
 
+        }
+
+        public ActionResult CPUTemperature()
+        {
+            double temperature=0;
+            if (cpuTemperature.IsAvailable)
+            {
+                temperature = cpuTemperature.Temperature.DegreesCelsius;
+            }
+            JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+            return Content(JsonConvert.SerializeObject(temperature, _jsonSetting), "application/json");
         }
 
         private static MySqlConnection OpenConnection()

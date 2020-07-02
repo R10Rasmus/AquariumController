@@ -107,3 +107,9 @@ C:\Projekter\PI\c#\AquariumController\InfoPages\obj\Debug\InfoPages.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\obj\Debug\InfoPages.pdb
 C:\Projekter\PI\c#\AquariumController\InfoPages\obj\Debug\InfoPages.csprojAssemblyReference.cache
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Newtonsoft.Json.xml
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\CpuTemperature.dll
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.ValueTuple.dll
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.dll
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.ValueTuple.xml
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.pdb
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.xml

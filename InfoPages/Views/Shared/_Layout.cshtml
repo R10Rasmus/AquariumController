@@ -7,35 +7,58 @@
         @Styles.Render("~/Content/css")
         @Scripts.Render("~/bundles/modernizr")
         <script src="@Url.Content("~/Content/canvasjs.min.js")"></script>
+
+        <script type="text/javascript">
+            window.addEventListener("load", myInit, true); function myInit() { $.getJSON("/home/CPUTemperature", CPUTemperatureSetText); };
+
+            function CPUTemperatureSetText(data) {
+                document.getElementById("CPUTemperature1").innerHTML = "CPU Temperature " + data;
+                document.getElementById("CPUTemperature2").innerHTML = "CPU Temperature " + data;
+            }
+            
+        </script>
+      
     </head>
-    <body>
-        <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    @Html.ActionLink("Dashboard", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-                </div>
-                <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        <li>@Html.ActionLink("Settings", "Settings", "Home")</li>
-                        <li>@Html.ActionLink("Temperature", "Temperature", "Home")</li>
-                    </ul>
+    <body >
+        <div class="container">
+            <div class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container">
+                    <div class="row">
+
+                            <div class="navbar-header">
+                                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </button>
+                                <h4 class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse" id="CPUTemperature1" style=" color: #9d9d9d;font-family: ' Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px;padding-top: 7px;float: right;">CPU Temperature </h4>
+
+                                @Html.ActionLink("Dashboard", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                            </div>
+
+                            <div class="navbar-collapse collapse">
+                                <ul class="nav navbar-nav">
+                                    <li>@Html.ActionLink("Settings", "Settings", "Home")</li>
+                                    <li>@Html.ActionLink("Temperature", "Temperature", "Home")</li>
+                                </ul>
+                                <h4 class="navbar-collapse collapse" data-toggle="collapse" data-target=".navbar-collapse" id="CPUTemperature2" style=" color: #9d9d9d;font-family: ' Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px;padding-top: 7px;float: right;">CPU Temperature </h4>
+
+                            </div>
+                           
+
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="container body-content">
-            @RenderBody()
-            <hr />
-            <footer>
-                <p>&copy; @DateTime.Now.Year - AquariumController InfoPages</p>
-            </footer>
-        </div>
+            <div class="container body-content">
+                @RenderBody()
+                <hr />
+                <footer>
+                    <p>&copy; @DateTime.Now.Year - AquariumController InfoPages</p>
+                </footer>
+            </div>
 
-        @Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/bootstrap")
-        @RenderSection("scripts", required: false)
+            @Scripts.Render("~/bundles/jquery")
+            @Scripts.Render("~/bundles/bootstrap")
+            @RenderSection("scripts", required: false)
     </body>
     </html>
