@@ -17,3 +17,5 @@ C:\Projekter\PI\c#\AquariumController\OneWire\bin\Debug\UnitsNet.xml
 C:\Projekter\PI\c#\AquariumController\OneWire\obj\Debug\OneWire.csproj.CopyComplete
 C:\Projekter\PI\c#\AquariumController\OneWire\obj\Debug\OneWire.dll
 C:\Projekter\PI\c#\AquariumController\OneWire\obj\Debug\OneWire.pdb
+C:\Projekter\PI\c#\AquariumController\OneWire\bin\Debug\OneWire.dll.config
+C:\Projekter\PI\c#\AquariumController\OneWire\obj\Debug\OneWire.csprojAssemblyReference.cache

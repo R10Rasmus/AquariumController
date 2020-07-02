@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lcd1602Controller", "Lcd160
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneWire", "OneWire\OneWire.csproj", "{3B23F58C-E092-49C3-B436-9FA93644FBF2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfoPages", "InfoPages\InfoPages.csproj", "{CDFD3152-DC12-426C-98FA-A85A59D0F79F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3B23F58C-E092-49C3-B436-9FA93644FBF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B23F58C-E092-49C3-B436-9FA93644FBF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B23F58C-E092-49C3-B436-9FA93644FBF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CDFD3152-DC12-426C-98FA-A85A59D0F79F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDFD3152-DC12-426C-98FA-A85A59D0F79F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDFD3152-DC12-426C-98FA-A85A59D0F79F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDFD3152-DC12-426C-98FA-A85A59D0F79F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
