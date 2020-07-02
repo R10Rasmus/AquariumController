@@ -12,8 +12,7 @@ It is build on .NET. It use .NET Core IoT Libraries as a basis, but raspberry pi
 
 It is an ASP.NET MVC project. It run on the Apach server via Mono, see this guide https://medium.com/@shrimpy/configure-apache2-mod-mono-to-run-asp-net-mvc5-application-on-ubuntu-14-04-314a700522b9.
 
-If it do not work (it is using mono-2 insted of mono-4) then create a symbolic link to the new installation of mono. The link can be create like this:
-ln -s -f /opt/mono-2.10/bin/mono /usr/bin/mono
+If it do not work (it is using mono-2 insted of mono-4) then create a symbolic link to the new installation of mono. 
 
 # Version 0.1
 Version 0.1 it will support (it is NOT in version 0.1, it is under development):
