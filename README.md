@@ -3,6 +3,8 @@ This project enables a raspberry pi zero to do basis aquarium controll.
 
 It is composed of a backend (AquariumController) and a fronend (InfoPages). Both use framework 4.8 and Mono (https://www.mono-project.com/).
 
+It run on the latest Mono version, see https://www.mono-project.com/download/stable/#download-lin-raspbian
+
 # AquariumController (Backend)
 It is build on .NET. It use .NET Core IoT Libraries as a basis, but raspberry pi zero do at this moment not support .NET Core IoT Libraries as-is(see https://www.flexlabs.org/2019/07/running-net-core-apps-on-raspberry-pi-zero). The tools needed from .NET Core IoT Libraries are extracted and rewritten in framework 4.8.
 
@@ -10,8 +12,7 @@ It is build on .NET. It use .NET Core IoT Libraries as a basis, but raspberry pi
 
 It is an ASP.NET MVC project. It run on the Apach server via Mono, see this guide https://medium.com/@shrimpy/configure-apache2-mod-mono-to-run-asp-net-mvc5-application-on-ubuntu-14-04-314a700522b9.
 
-If it do not work (it is using mono-2 insted of mono-4) then create a symbolic link to the new installation of mono. The link can be create like this:
-ln -s -f /opt/mono-2.10/bin/mono /usr/bin/mono
+If it do not work (it is using mono-2 insted of mono-4) then create a symbolic link to the new installation of mono. 
 
 # Version 0.1
 Version 0.1 it will support (it is NOT in version 0.1, it is under development):
