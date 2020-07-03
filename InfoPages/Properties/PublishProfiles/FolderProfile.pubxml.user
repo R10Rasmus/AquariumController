@@ -16,6 +16,12 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     <File Include="bin/BouncyCastle.Crypto.dll">
       <publishTime>02/21/2020 16:24:54</publishTime>
     </File>
+    <File Include="bin/Content/Site.css">
+      <publishTime>07/02/2020 17:51:09</publishTime>
+    </File>
+    <File Include="bin/CpuTemperature.dll">
+      <publishTime>07/02/2020 17:33:32</publishTime>
+    </File>
     <File Include="bin/Google.Protobuf.dll">
       <publishTime>06/03/2020 14:58:16</publishTime>
     </File>
@@ -23,10 +29,10 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>06/03/2020 07:02:12</publishTime>
     </File>
     <File Include="bin/InfoPages.dll">
-      <publishTime>07/02/2020 13:29:08</publishTime>
+      <publishTime>07/03/2020 14:46:14</publishTime>
     </File>
     <File Include="bin/InfoPages.pdb">
-      <publishTime>07/02/2020 13:29:08</publishTime>
+      <publishTime>07/03/2020 14:46:14</publishTime>
     </File>
     <File Include="bin/K4os.Compression.LZ4.dll">
       <publishTime>07/03/2019 22:59:30</publishTime>
@@ -214,6 +220,9 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     <File Include="bin/System.Runtime.CompilerServices.Unsafe.dll">
       <publishTime>02/21/2020 03:58:04</publishTime>
     </File>
+    <File Include="bin/System.ValueTuple.dll">
+      <publishTime>05/15/2018 13:29:52</publishTime>
+    </File>
     <File Include="bin/System.Web.Helpers.dll">
       <publishTime>11/28/2018 12:04:24</publishTime>
     </File>
@@ -243,6 +252,12 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     </File>
     <File Include="bin/Ubiety.Dns.Core.dll">
       <publishTime>03/17/2020 10:35:10</publishTime>
+    </File>
+    <File Include="bin/UnitsNet.dll">
+      <publishTime>06/30/2020 09:02:06</publishTime>
+    </File>
+    <File Include="bin/UnitsNet.pdb">
+      <publishTime>06/30/2020 09:02:06</publishTime>
     </File>
     <File Include="bin/WebGrease.dll">
       <publishTime>01/23/2014 12:57:34</publishTime>
@@ -278,7 +293,10 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>07/02/2020 12:50:43</publishTime>
     </File>
     <File Include="Content/Site.css">
-      <publishTime>07/01/2020 11:08:38</publishTime>
+      <publishTime>07/02/2020 17:51:09</publishTime>
+    </File>
+    <File Include="CpuTemperature.dll">
+      <publishTime>07/02/2020 17:33:32</publishTime>
     </File>
     <File Include="favicon.ico">
       <publishTime>07/01/2020 11:08:38</publishTime>
@@ -638,19 +656,19 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>07/02/2020 09:47:18</publishTime>
     </File>
     <File Include="Views/Home/Index.cshtml">
-      <publishTime>07/02/2020 13:14:16</publishTime>
+      <publishTime>07/03/2020 14:19:13</publishTime>
     </File>
     <File Include="Views/Home/Settings.cshtml">
       <publishTime>07/02/2020 09:46:38</publishTime>
     </File>
     <File Include="Views/Home/Temperature.cshtml">
-      <publishTime>07/02/2020 13:13:36</publishTime>
+      <publishTime>07/03/2020 07:13:29</publishTime>
     </File>
     <File Include="Views/Shared/Error.cshtml">
       <publishTime>07/01/2020 11:08:38</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
-      <publishTime>07/02/2020 12:57:25</publishTime>
+      <publishTime>07/03/2020 14:41:58</publishTime>
     </File>
     <File Include="Views/Web.config">
       <publishTime>07/01/2020 11:08:38</publishTime>
@@ -659,7 +677,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>07/01/2020 11:08:38</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>07/02/2020 13:29:08</publishTime>
+      <publishTime>07/02/2020 18:43:59</publishTime>
     </File>
   </ItemGroup>
 </Project>

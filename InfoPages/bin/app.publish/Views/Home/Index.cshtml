@@ -18,7 +18,7 @@
                         contentFormatter: function (e) {
                             var content = "";
                             for (var i = 0; i < e.entries.length; i++) {
-                                content = CanvasJS.formatDate(e.entries[i].dataPoint.x, "HH:mm MM/DD/YYYY");
+                                content = CanvasJS.formatDate(e.entries[i].dataPoint.x, "HH:mm DD/MM/YYYY") +" " + e.entries[i].dataPoint.y+"C";
                             }
                             return content;
                         }
@@ -56,8 +56,7 @@
 
 <div class="col-md-12">
     <div class="row">
-        <div id="chartContainer" style="height: 33%; width: 100%;"></div>
-
+        <div id="chartContainer" style="width:100%;height:410px" ></div>
     </div>
 
 </div>

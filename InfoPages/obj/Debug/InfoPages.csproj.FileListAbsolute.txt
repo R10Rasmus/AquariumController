@@ -1,3 +1,4 @@
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Content\Site.css
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\InfoPages.dll.config
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\InfoPages.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\InfoPages.pdb
@@ -52,6 +53,7 @@ C:\Projekter\PI\c#\AquariumController\InfoPages\bin\roslyn\VBCSCompiler.exe
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\roslyn\VBCSCompiler.exe.config
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Antlr3.Runtime.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\BouncyCastle.Crypto.dll
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\CpuTemperature.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Google.Protobuf.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\K4os.Compression.LZ4.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\K4os.Compression.LZ4.Streams.dll
@@ -66,6 +68,7 @@ C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Memory.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Net.Http.Formatting.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Numerics.Vectors.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Runtime.CompilerServices.Unsafe.dll
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.ValueTuple.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.Helpers.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.Http.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.Http.WebHost.dll
@@ -76,6 +79,7 @@ C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.WebPages.Deployme
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.WebPages.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.WebPages.Razor.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Ubiety.Dns.Core.dll
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\WebGrease.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Zstandard.Net.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Google.Protobuf.pdb
@@ -84,11 +88,13 @@ C:\Projekter\PI\c#\AquariumController\InfoPages\bin\K4os.Compression.LZ4.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\K4os.Compression.LZ4.Streams.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\K4os.Hash.xxHash.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\MySql.Data.xml
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Newtonsoft.Json.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Renci.SshNet.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Buffers.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Memory.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Numerics.Vectors.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Runtime.CompilerServices.Unsafe.xml
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.ValueTuple.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.Helpers.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.Mvc.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.Optimization.xml
@@ -96,6 +102,8 @@ C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.Razor.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.WebPages.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.WebPages.Deployment.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.WebPages.Razor.xml
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.pdb
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Antlr3.Runtime.pdb
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Net.Http.Formatting.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.Http.xml
@@ -106,10 +114,3 @@ C:\Projekter\PI\c#\AquariumController\InfoPages\obj\Debug\InfoPages.csproj.CopyC
 C:\Projekter\PI\c#\AquariumController\InfoPages\obj\Debug\InfoPages.dll
 C:\Projekter\PI\c#\AquariumController\InfoPages\obj\Debug\InfoPages.pdb
 C:\Projekter\PI\c#\AquariumController\InfoPages\obj\Debug\InfoPages.csprojAssemblyReference.cache
-C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Newtonsoft.Json.xml
-C:\Projekter\PI\c#\AquariumController\InfoPages\bin\CpuTemperature.dll
-C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.ValueTuple.dll
-C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.dll
-C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.ValueTuple.xml
-C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.pdb
-C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.xml

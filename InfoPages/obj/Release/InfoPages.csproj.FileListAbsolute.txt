@@ -107,3 +107,10 @@ C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Buffers.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Memory.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Numerics.Vectors.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Runtime.CompilerServices.Unsafe.xml
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\CpuTemperature.dll
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.ValueTuple.dll
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.dll
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.ValueTuple.xml
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.pdb
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.xml
+C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Content\Site.css

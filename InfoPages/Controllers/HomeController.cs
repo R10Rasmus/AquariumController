@@ -107,19 +107,19 @@ namespace InfoPages.Controllers
                 switch (timeSpan.Value)
                 {
                     case EnumTimeSpan.OneHour:
-                        where = where + DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd hh:mm:ss");
+                        where = where + DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd HH:mm:ss");
                         break;
                     case EnumTimeSpan.OneDay:
-                        where = where + DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd hh:mm:ss");
+                        where = where + DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss");
                         break;
                     case EnumTimeSpan.OneWeek:
-                        where = where + DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd hh:mm:ss");
+                        where = where + DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd HH:mm:ss");
                         break;
                     case EnumTimeSpan.OneMonth:
-                        where = where + DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd hh:mm:ss");
+                        where = where + DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd HH:mm:ss");
                         break;
                     case EnumTimeSpan.OneYear:
-                        where = where + DateTime.Now.AddYears(-1).ToString("yyyy-MM-dd hh:mm:ss");
+                        where = where + DateTime.Now.AddYears(-1).ToString("yyyy-MM-dd HH:mm:ss");
                         break;
                 }
                 where += "')";
@@ -155,7 +155,7 @@ namespace InfoPages.Controllers
                 temperature = cpuTemperature.Temperature.DegreesCelsius;
             }
             JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
-            return Content(JsonConvert.SerializeObject(temperature, _jsonSetting), "application/json");
+            return Content(JsonConvert.SerializeObject(Math.Round(temperature,1), _jsonSetting), "application/json");
         }
 
         private static MySqlConnection OpenConnection()
