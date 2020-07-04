@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Web;
 using System.Web.Mvc;
 
@@ -14,10 +15,13 @@ namespace InfoPages.Controllers
     public class HomeController : Controller
     {
         CpuTemperature cpuTemperature = new CpuTemperature();
+
         public ActionResult Index()
         {
-            return View();
+            return View(ReadTemperatureValues());
         }
+
+
 
         public ActionResult Settings()
         {
@@ -90,7 +94,7 @@ namespace InfoPages.Controllers
         public ActionResult Temperature()
         {
 
-            return View();
+            return View(ReadTemperatureValues());
         }
 
         public ActionResult TemperatureData(EnumTimeSpan? timeSpan)
@@ -163,6 +167,41 @@ namespace InfoPages.Controllers
             MySqlConnection conn = new MySqlConnection(ConfigurationManager.ConnectionStrings["mysql"].ConnectionString);
             conn.Open();
             return conn;
+        }
+
+        private static Graph ReadTemperatureValues()
+        {
+            int _temperatureMax = 0;
+            int _temperatureMin = 0;
+
+            MySqlConnection conn = OpenConnection();
+
+            MySqlCommand cmd = new MySqlCommand
+            {
+                CommandText = "SELECT value FROM settings where title = 'TemperatureMax'",
+                Connection = conn
+            };
+            var rdr = cmd.ExecuteReader();
+
+            rdr.Read();
+            _temperatureMax = int.Parse(rdr["value"].ToString());
+
+            rdr.Close();
+            cmd = new MySqlCommand
+            {
+                CommandText = "SELECT value FROM settings where title = 'TemperatureMin'",
+                Connection = conn
+            };
+            rdr = cmd.ExecuteReader();
+
+            rdr.Read();
+            _temperatureMin = int.Parse(rdr["value"].ToString());
+
+
+            rdr.Close();
+            conn.Close();
+
+            return new Graph() { Max = _temperatureMax, Min = _temperatureMin };
         }
     }
 }

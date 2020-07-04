@@ -20,6 +20,7 @@ namespace AquariumController
 
         static double _Tempertur = 0;
 
+        static double _TemperturCalibrateOffSet = 0.6;
         static void Main(string[] args)
         {
            
@@ -75,7 +76,7 @@ namespace AquariumController
                 {
                     _Tempertur = getTempertur(Helper.GetSettingFromDb(conn, "WaterTemperatureId"));
 
-                    string tempterturText = Helper.GetSettingFromDb(conn, "TemperatureText") + (int)_Tempertur + (char)SetCharacters.TemperatureCharactersNumber;
+                    string tempterturText = Helper.GetSettingFromDb(conn, "TemperatureText") + Math.Round(_Tempertur,0) + (char)SetCharacters.TemperatureCharactersNumber;
 
                     console.ReplaceLine(0, tempterturText);
                     
@@ -148,7 +149,7 @@ namespace AquariumController
             {
                 if(dev.DeviceId == TemperatureId)
                 {
-                    return dev.ReadTemperature().DegreesCelsius;
+                    return dev.ReadTemperature().DegreesCelsius+ _TemperturCalibrateOffSet;
                 }
             }
 

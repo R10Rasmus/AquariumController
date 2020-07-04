@@ -193,6 +193,7 @@
     </Compile>
     <Compile Include="Models\DataPoint.cs" />
     <Compile Include="Models\EnumTimeSpan.cs" />
+    <Compile Include="Models\Graph.cs" />
     <Compile Include="Models\Setting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
