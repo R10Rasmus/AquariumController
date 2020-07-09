@@ -179,13 +179,20 @@ namespace AquariumController
         private static void AirPumpOnOff(MySqlConnection conn)
         {
 
-            if (bool.Parse(Helper.GetSettingFromDb(conn, "AirPumpOnOff")))
+            if (bool.TryParse(Helper.GetSettingFromDb(conn, "AirPumpOnOff"), out bool result))
             {
-                _Controller.Write(AIRPUMPPIN, PinValue.High);
-            }
-            else
-            {
-                _Controller.Write(AIRPUMPPIN, PinValue.Low);
+                if (result)
+                {
+
+                    _Controller.Write(AIRPUMPPIN, PinValue.High);
+                    Console.WriteLine($"Air pump on!");
+                }
+                else
+                {
+                    _Controller.Write(AIRPUMPPIN, PinValue.Low);
+
+                    Console.WriteLine($"Air pump off!");
+                }
             }
 
         }
@@ -229,8 +236,8 @@ namespace AquariumController
 
         private static void HeaterControl(int _temperatureMax, int _temperatureMin, ILocalHueClient client, Light aquariumHeater, double _temperature, LcdConsole console)
         {
-            //if the system has an heater
-            if (aquariumHeater != null)
+            //if the system has an heater and a temperature
+            if (aquariumHeater != null && _temperature >0)
             {
                 //if temperature is over max, then turn off heater
                 if (_temperature > _temperatureMax)

@@ -11,7 +11,6 @@ C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\bin\Release\System.Buffe
 C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\bin\Release\System.Memory.xml
 C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\bin\Release\System.Numerics.Vectors.xml
 C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\bin\Release\System.Runtime.CompilerServices.Unsafe.xml
-C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\obj\Release\Lcd1602Controller.csprojAssemblyReference.cache
 C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\obj\Release\Lcd1602Controller.csproj.CoreCompileInputs.cache
 C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\obj\Release\Lcd1602Controller.csproj.CopyComplete
 C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\obj\Release\Lcd1602Controller.dll
