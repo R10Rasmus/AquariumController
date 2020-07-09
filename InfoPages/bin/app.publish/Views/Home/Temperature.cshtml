@@ -1,4 +1,7 @@
-﻿@{
+﻿@using InfoPages.Models
+@model Graph
+
+@{
     ViewBag.Title = "Temperature";
 }
 
@@ -8,7 +11,7 @@
     <script src="/bundles/jquery" type="text/javascript"></script>
 
     <script>
-        
+
 
         window.onload = function () {
             var dps = [];
@@ -28,10 +31,22 @@
                         }
                         return content;
                     }
-                },	
+                },
                 axisX: {
                     valueFormatString: "DD-MM-YY HH:mm",
                     labelAngle: -50
+                },
+                  axisY: {
+                    stripLines: [
+                        {
+                            value: @Model.Max,
+                            color: "red"
+                        }, {
+                            value: @Model.Min,
+                            color: "red"
+                          }],
+                      minimum: 20,
+                    valueFormatString: "####"
                 },
                 data: [{
                     type: "line",
@@ -54,7 +69,7 @@
                 chart.render();
             }
         }
-       
+
     </script>
 </head>
 <body>

@@ -8,6 +8,7 @@ using Q42.HueApi.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Device.Gpio;
 using System.Linq;
 using System.Threading;
 using System.Timers;
@@ -16,42 +17,43 @@ namespace AquariumController
 {
     class Program
     {
-      
+        const double _TemperturCalibrateOffSet = 0.6;
+
+        const int AIRPUMPPIN = 12;
+
+        const int LCDRSPIN = 07;
+        const int LCDENABLEPIN = 08;
+        static readonly int[] LCDDATA = { 25, 24, 23, 18 };
 
         static double _Tempertur = 0;
 
-        static double _TemperturCalibrateOffSet = 0.6;
+        static DateTime _AirPumpStart;
+        static DateTime _AirPumpStop;
+
+        static GpioController _Controller;
+
         static void Main(string[] args)
         {
-           
+
             Console.WriteLine("AquariumController is running");
 
-            int _temperatureMax = 0;
-            int _temperatureMin = 0;
-
             MySqlConnection conn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
-
             conn.Open();
 
-            _temperatureMax = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureMax"));
-            Console.WriteLine($"TemperatureMax is {_temperatureMax}");
+            SetupMaxMinTemperature(out int _temperatureMax, out int _temperatureMin, conn);
 
-            _temperatureMin = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureMin"));
-            Console.WriteLine($"TemperatureMin is {_temperatureMin}");
+            SetupAirPumpStartStopTime(conn);
 
-            using (Lcd1602 lcd = new Lcd1602(registerSelectPin: 07, enablePin: 08, dataPins: new int[] { 25, 24, 23, 18 }, shouldDispose: true))
+            SetupHeater(conn, out ILocalHueClient client, out Light aquariumHeater);
+
+            System.Threading.Timer saveTemperturTimer = SetupTemperatureSaveInterval(conn);
+
+            _Controller = new GpioController();
+            _Controller.OpenPin(AIRPUMPPIN, PinMode.Output);
+
+            using (Lcd1602 lcd = new Lcd1602(registerSelectPin: LCDRSPIN, enablePin: LCDENABLEPIN, dataPins: LCDDATA, shouldDispose: true))
             {
-                ILocalHueClient client = new LocalHueClient(Helper.GetSettingFromDb(conn, "PhilipsHueIp"));
-                client.Initialize(Helper.GetSettingFromDb(conn, "PhilipsHuePersonalAppKey"));
 
-                IEnumerable<Light> lights = client.GetLightsAsync().GetAwaiter().GetResult();
-
-                foreach (Light item in lights)
-                {
-                    Console.WriteLine("name:" + item.Name + " id:" + item.Id);
-                }
-
-                Light aquariumHeater = lights.FirstOrDefault(t => t.Name == Helper.GetSettingFromDb(conn, "HeaterName"));
                 LcdConsole console = new LcdConsole(lcd, "A00", false)
                 {
                     LineFeedMode = LineWrapMode.Wrap,
@@ -66,59 +68,126 @@ namespace AquariumController
                 bool _revers = false;
                 int _positionCount = 0;
 
-                // Create saver tempertur timer
-                int saveTemperturIntervaleInMin = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureSaveInterval"));
-                Console.WriteLine($"TemperatureSaveInterval is {saveTemperturIntervaleInMin}");
-                AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);
-                System.Threading.Timer saveTemperturTimer = new System.Threading.Timer(saveTempertur, saveTemperturAutoResetEvent, 5000, saveTemperturIntervaleInMin * 60 * 1000);
-
                 while (!Console.KeyAvailable)
                 {
                     _Tempertur = getTempertur(Helper.GetSettingFromDb(conn, "WaterTemperatureId"));
 
-                    string tempterturText = Helper.GetSettingFromDb(conn, "TemperatureText") + Math.Round(_Tempertur,0) + (char)SetCharacters.TemperatureCharactersNumber;
+                    string tempterturText = Helper.GetSettingFromDb(conn, "TemperatureText") + Math.Round(_Tempertur, 0) + (char)SetCharacters.TemperatureCharactersNumber;
 
                     console.ReplaceLine(0, tempterturText);
-                    
+
                     Animation.ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
-                    Thread.Sleep(1000);
 
                     HeaterControl(_temperatureMax, _temperatureMin, client, aquariumHeater, _Tempertur, console);
 
+                    SetAirPumpOnOff(conn);
+                    AirPumpOnOff(conn);
+
+                    Thread.Sleep(1000);
                 }
 
-
-             //   _ = saveTemperturAutoResetEvent.WaitOne();
-                saveTemperturTimer.Dispose();
-
                 console.Dispose();
-                conn.Close();
-                conn.Dispose();
-
             }
 
-            //int pinOut = 4;
-            //int pinIn = 21;
+            saveTemperturTimer.Dispose();
 
-            //GpioController controller = new GpioController();
-            //controller.OpenPin(pinOut, PinMode.Output);
-            //controller.OpenPin(pinIn, PinMode.InputPullDown);
+            conn.Close();
+            conn.Dispose();
 
-            //while (!Console.KeyAvailable)
-            //{
-            //    if(controller.Read(pinIn) == PinValue.High)
-            //    {
-            //        Console.WriteLine("on!");
-            //        controller.Write(pinOut, PinValue.High);
-            //    }
-            //    else
-            //    {
-            //        Console.WriteLine("off!");
-            //        controller.Write(pinOut, PinValue.Low);
-            //    }
-            //}
+            _Controller.Dispose();
 
-            //controller.Dispose();
+
+        }
+
+        private static System.Threading.Timer SetupTemperatureSaveInterval(MySqlConnection conn)
+        {
+            // Create saver tempertur timer
+            int saveTemperturIntervaleInMin = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureSaveInterval"));
+            Console.WriteLine($"TemperatureSaveInterval is {saveTemperturIntervaleInMin}");
+
+            AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);
+            System.Threading.Timer saveTemperturTimer = new System.Threading.Timer(saveTempertur, saveTemperturAutoResetEvent, 5000, saveTemperturIntervaleInMin * 60 * 1000);
+            return saveTemperturTimer;
+        }
+
+        private static void SetupAirPumpStartStopTime(MySqlConnection conn)
+        {
+            string time = Helper.GetSettingFromDb(conn, "AirPumpStart");
+            if (!string.IsNullOrWhiteSpace(time))
+            {
+                string[] timeSpil = time.Split(':');
+
+                new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, int.Parse(timeSpil[0]), int.Parse(timeSpil[1]), 0);
+
+                _AirPumpStart = DateTime.Parse(Helper.GetSettingFromDb(conn, "AirPumpStart"));
+
+                Console.WriteLine($"AirPumpStart is {_AirPumpStart.TimeOfDay}");
+            }
+
+            time = Helper.GetSettingFromDb(conn, "AirPumpStop");
+            if (!string.IsNullOrWhiteSpace(time))
+            {
+                string[] timeSpil = time.Split(':');
+
+                new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, int.Parse(timeSpil[0]), int.Parse(timeSpil[1]), 0);
+
+                _AirPumpStop = DateTime.Parse(Helper.GetSettingFromDb(conn, "AirPumpStop"));
+
+                Console.WriteLine($"AirPumpStop is {_AirPumpStart.TimeOfDay}");
+            }
+        }
+
+        private static void SetupMaxMinTemperature(out int _temperatureMax, out int _temperatureMin, MySqlConnection conn)
+        {
+            _temperatureMax = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureMax"));
+            Console.WriteLine($"TemperatureMax is {_temperatureMax}");
+
+            _temperatureMin = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureMin"));
+            Console.WriteLine($"TemperatureMin is {_temperatureMin}");
+        }
+
+        private static void SetupHeater(MySqlConnection conn, out ILocalHueClient client, out Light aquariumHeater)
+        {
+            Console.WriteLine($"Getting PhilipsHue Lights...");
+
+            client = new LocalHueClient(Helper.GetSettingFromDb(conn, "PhilipsHueIp"));
+            client.Initialize(Helper.GetSettingFromDb(conn, "PhilipsHuePersonalAppKey"));
+
+            IEnumerable<Light> lights = client.GetLightsAsync().GetAwaiter().GetResult();
+
+            foreach (Light item in lights)
+            {
+                Console.WriteLine("name:" + item.Name + " id:" + item.Id);
+            }
+
+            aquariumHeater = lights.FirstOrDefault(t => t.Name == Helper.GetSettingFromDb(conn, "HeaterName"));
+        }
+
+        private static void SetAirPumpOnOff(MySqlConnection conn)
+        {
+            if (DateTime.Now.TimeOfDay >= _AirPumpStart.TimeOfDay)
+            {
+                Helper.SaveSettingValue(conn, "airPumpOnOff", true.ToString());
+            }
+
+            if (DateTime.Now.TimeOfDay >= _AirPumpStop.TimeOfDay)
+            {
+                Helper.SaveSettingValue(conn, "airPumpOnOff", false.ToString());
+            }
+        }
+
+        private static void AirPumpOnOff(MySqlConnection conn)
+        {
+
+            if (bool.Parse(Helper.GetSettingFromDb(conn, "AirPumpOnOff")))
+            {
+                _Controller.Write(AIRPUMPPIN, PinValue.High);
+            }
+            else
+            {
+                _Controller.Write(AIRPUMPPIN, PinValue.Low);
+            }
+
         }
 
         private static void saveTempertur(Object stateInfo)
@@ -142,7 +211,9 @@ namespace AquariumController
 
         }
 
-       private static double getTempertur(string TemperatureId)
+
+
+        private static double getTempertur(string TemperatureId)
         {
             // Quick and simple way to find a thermometer and print the temperature
             foreach (var dev in OneWireThermometerDevice.EnumerateDevices())
@@ -166,6 +237,9 @@ namespace AquariumController
                 {
                     LightCommand lightCommand = new LightCommand() { On = false };
                     client.SendCommandAsync(lightCommand, new List<string> { aquariumHeater.Id });
+
+                    Console.WriteLine($"Heater off!");
+
                     console.BlinkDisplay(2);
                 }
 
@@ -174,6 +248,8 @@ namespace AquariumController
                 {
                     LightCommand lightCommand = new LightCommand() { On = true };
                     client.SendCommandAsync(lightCommand, new List<string> { aquariumHeater.Id });
+
+                    Console.WriteLine($"Heater on!");
                 }
             }
         }

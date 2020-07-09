@@ -37,5 +37,20 @@ namespace AquariumController.DB
 
         }
 
+        public static void SaveSettingValue(MySqlConnection conn, string settingName, string value)
+        {
+
+            MySqlCommand cmd = new MySqlCommand
+            {
+                CommandText = "update settings set value =" + value+ "where title =" + settingName +";",
+                Connection = conn
+            };
+
+            var rdr = cmd.ExecuteNonQuery();
+
+
+
+        }
+
     }
 }
