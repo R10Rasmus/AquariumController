@@ -58,3 +58,5 @@ C:\Projekter\PI\c#\AquariumController\AquariumController\obj\Release\AquariumCon
 C:\Projekter\PI\c#\AquariumController\AquariumController\obj\Release\AquariumController.csproj.CopyComplete
 C:\Projekter\PI\c#\AquariumController\AquariumController\obj\Release\AquariumController.exe
 C:\Projekter\PI\c#\AquariumController\AquariumController\obj\Release\AquariumController.pdb
+C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\uFire_ISE.dll
+C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\uFire_ISE.pdb

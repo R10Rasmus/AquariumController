@@ -78,7 +78,6 @@ C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Net.Http.Formatting.x
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.Http.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.Web.Http.WebHost.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.xml
-C:\Projekter\PI\c#\AquariumController\InfoPages\obj\Release\InfoPages.csprojAssemblyReference.cache
 C:\Projekter\PI\c#\AquariumController\InfoPages\obj\Release\InfoPages.csproj.CoreCompileInputs.cache
 C:\Projekter\PI\c#\AquariumController\InfoPages\obj\Release\InfoPages.csproj.CopyComplete
 C:\Projekter\PI\c#\AquariumController\InfoPages\obj\Release\InfoPages.dll

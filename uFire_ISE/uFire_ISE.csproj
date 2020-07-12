@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+   <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+    <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Memory" Version="4.5.4" />
+    </ItemGroup>
+  
+    <ItemGroup>
+      <Reference Include="System.Device.Gpio">
+        <HintPath>..\AquariumController\System.Device.Gpio.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

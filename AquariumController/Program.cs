@@ -9,9 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Device.Gpio;
+using System.Device.I2c;
 using System.Linq;
 using System.Threading;
-using System.Timers;
 
 namespace AquariumController
 {
@@ -25,7 +25,13 @@ namespace AquariumController
         const int LCDENABLEPIN = 08;
         static readonly int[] LCDDATA = { 25, 24, 23, 18 };
 
+        const int BUSID = 1;
+        const int I2CADDRESS = 0x3F;
+
         static double _Tempertur = 0;
+        static bool _AirPumpOnOff = false;
+        static bool _TimerAirPumpOnOff = false;
+
 
         static DateTime _AirPumpStart;
         static DateTime _AirPumpStop;
@@ -34,9 +40,15 @@ namespace AquariumController
 
         static void Main(string[] args)
         {
-
             Console.WriteLine("AquariumController is running");
 
+            var settings = new I2cConnectionSettings(BUSID, I2CADDRESS);
+            var device = I2cDevice.Create(settings);
+
+            Console.WriteLine("Setting up UFire EC Probe...");
+            Iot.Device.UFire.UFire_pH uFire_pH = new Iot.Device.UFire.UFire_pH(device);
+
+            Console.WriteLine("Setting up MySql db");
             MySqlConnection conn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
             conn.Open();
 
@@ -46,7 +58,7 @@ namespace AquariumController
 
             SetupHeater(conn, out ILocalHueClient client, out Light aquariumHeater);
 
-            System.Threading.Timer saveTemperturTimer = SetupTemperatureSaveInterval(conn);
+            Timer saveTemperturTimer = SetupTemperatureSaveInterval(conn);
 
             _Controller = new GpioController();
             _Controller.OpenPin(AIRPUMPPIN, PinMode.Output);
@@ -72,9 +84,11 @@ namespace AquariumController
                 {
                     _Tempertur = getTempertur(Helper.GetSettingFromDb(conn, "WaterTemperatureId"));
 
-                    string tempterturText = Helper.GetSettingFromDb(conn, "TemperatureText") + Math.Round(_Tempertur, 0) + (char)SetCharacters.TemperatureCharactersNumber;
+                    string tempterturText = Math.Round(_Tempertur, 0).ToString() + (char)SetCharacters.TemperatureCharactersNumber;
 
-                    console.ReplaceLine(0, tempterturText);
+                    string pHText = Math.Round(uFire_pH.MeasurepH(Convert.ToSingle(_Tempertur)),1)+"pH";
+
+                    console.ReplaceLine(0, tempterturText+" "+ pHText);
 
                     Animation.ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
 
@@ -167,12 +181,21 @@ namespace AquariumController
         {
             if (DateTime.Now.TimeOfDay >= _AirPumpStart.TimeOfDay)
             {
-                Helper.SaveSettingValue(conn, "airPumpOnOff", true.ToString());
+                if(_TimerAirPumpOnOff != true)
+                {
+                    _TimerAirPumpOnOff = true;
+                    Helper.SaveSettingValue(conn, "airPumpOnOff", true.ToString());
+                }
+                
             }
 
             if (DateTime.Now.TimeOfDay >= _AirPumpStop.TimeOfDay)
             {
-                Helper.SaveSettingValue(conn, "airPumpOnOff", false.ToString());
+                if (_TimerAirPumpOnOff != false)
+                {
+                    _TimerAirPumpOnOff = false;
+                    Helper.SaveSettingValue(conn, "airPumpOnOff", false.ToString());
+                }
             }
         }
 
@@ -181,18 +204,24 @@ namespace AquariumController
 
             if (bool.TryParse(Helper.GetSettingFromDb(conn, "AirPumpOnOff"), out bool result))
             {
-                if (result)
+                if(_AirPumpOnOff != result)
                 {
+                    _AirPumpOnOff = result;
 
-                    _Controller.Write(AIRPUMPPIN, PinValue.High);
-                    Console.WriteLine($"Air pump on!");
-                }
-                else
-                {
-                    _Controller.Write(AIRPUMPPIN, PinValue.Low);
+                    if (result)
+                    {
 
-                    Console.WriteLine($"Air pump off!");
+                        _Controller.Write(AIRPUMPPIN, PinValue.High);
+                        Console.WriteLine($"Air pump on!");
+                    }
+                    else
+                    {
+                        _Controller.Write(AIRPUMPPIN, PinValue.Low);
+
+                        Console.WriteLine($"Air pump off!");
+                    }
                 }
+                
             }
 
         }

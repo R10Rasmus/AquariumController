@@ -189,6 +189,10 @@
       <Project>{3b23f58c-e092-49c3-b436-9fa93644fbf2}</Project>
       <Name>OneWire</Name>
     </ProjectReference>
+    <ProjectReference Include="..\uFire_ISE\uFire_ISE.csproj">
+      <Project>{c1493a68-3e11-4b29-a3ac-8a4a56d9d85f}</Project>
+      <Name>uFire_ISE</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="System.Device.Gpio.dll" />
