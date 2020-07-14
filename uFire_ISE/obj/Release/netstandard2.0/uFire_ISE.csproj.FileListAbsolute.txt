@@ -8,3 +8,4 @@ C:\Projekter\PI\c#\AquariumController\uFire_ISE\bin\Release\netstandard2.0\uFire
 C:\Projekter\PI\c#\AquariumController\uFire_ISE\obj\Release\netstandard2.0\uFire_ISE.dll
 C:\Projekter\PI\c#\AquariumController\uFire_ISE\obj\Release\netstandard2.0\uFire_ISE.pdb
 C:\Projekter\PI\c#\AquariumController\uFire_ISE\obj\Release\netstandard2.0\uFire_ISE.csproj.CoreCompileInputs.cache
+C:\Projekter\PI\c#\AquariumController\uFire_ISE\obj\Release\netstandard2.0\uFire_ISE.csprojAssemblyReference.cache

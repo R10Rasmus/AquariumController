@@ -29,6 +29,7 @@ namespace AquariumController
         const int I2CADDRESS = 0x3F;
 
         static double _Tempertur = 0;
+        static double _PH = 0;
         static bool _AirPumpOnOff = false;
         static bool _TimerAirPumpOnOff = false;
 
@@ -42,8 +43,8 @@ namespace AquariumController
         {
             Console.WriteLine("AquariumController is running");
 
-            var settings = new I2cConnectionSettings(BUSID, I2CADDRESS);
-            var device = I2cDevice.Create(settings);
+            I2cConnectionSettings settings = new I2cConnectionSettings(BUSID, I2CADDRESS);
+            I2cDevice device = I2cDevice.Create(settings);
 
             Console.WriteLine("Setting up UFire EC Probe...");
             Iot.Device.UFire.UFire_pH uFire_pH = new Iot.Device.UFire.UFire_pH(device);
@@ -58,7 +59,8 @@ namespace AquariumController
 
             SetupHeater(conn, out ILocalHueClient client, out Light aquariumHeater);
 
-            Timer saveTemperturTimer = SetupTemperatureSaveInterval(conn);
+            Timer saveTemperturTimer = SetupSaveInterval(conn, "TemperatureSaveInterval", saveTempertur);
+            Timer savePhTimer = SetupSaveInterval(conn, "PHSaveInterval", savePh);
 
             _Controller = new GpioController();
             _Controller.OpenPin(AIRPUMPPIN, PinMode.Output);
@@ -84,11 +86,13 @@ namespace AquariumController
                 {
                     _Tempertur = getTempertur(Helper.GetSettingFromDb(conn, "WaterTemperatureId"));
 
+                    //_PH = Math.Round(uFire_pH.MeasurepH(Convert.ToSingle(_Tempertur)), 1);
+
                     string tempterturText = Math.Round(_Tempertur, 0).ToString() + (char)SetCharacters.TemperatureCharactersNumber;
 
-                    string pHText = Math.Round(uFire_pH.MeasurepH(Convert.ToSingle(_Tempertur)),1)+"pH";
+                    //string pHText = _PH+"pH";
 
-                    console.ReplaceLine(0, tempterturText+" "+ pHText);
+                    //console.ReplaceLine(0, tempterturText+" "+ pHText);
 
                     Animation.ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
 
@@ -104,6 +108,7 @@ namespace AquariumController
             }
 
             saveTemperturTimer.Dispose();
+            savePhTimer.Dispose();
 
             conn.Close();
             conn.Dispose();
@@ -113,14 +118,14 @@ namespace AquariumController
 
         }
 
-        private static System.Threading.Timer SetupTemperatureSaveInterval(MySqlConnection conn)
+        private static System.Threading.Timer SetupSaveInterval(MySqlConnection conn, string SettingFromDb, TimerCallback callback)
         {
             // Create saver tempertur timer
-            int saveTemperturIntervaleInMin = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureSaveInterval"));
-            Console.WriteLine($"TemperatureSaveInterval is {saveTemperturIntervaleInMin}");
+            int saveTemperturIntervaleInMin = int.Parse(Helper.GetSettingFromDb(conn, SettingFromDb));
+            Console.WriteLine($"{SettingFromDb} is {saveTemperturIntervaleInMin}");
 
             AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);
-            System.Threading.Timer saveTemperturTimer = new System.Threading.Timer(saveTempertur, saveTemperturAutoResetEvent, 5000, saveTemperturIntervaleInMin * 60 * 1000);
+            System.Threading.Timer saveTemperturTimer = new System.Threading.Timer(callback, saveTemperturAutoResetEvent, 5000, saveTemperturIntervaleInMin * 60 * 1000);
             return saveTemperturTimer;
         }
 
@@ -246,6 +251,27 @@ namespace AquariumController
             }
 
         }
+        private static void savePh(Object stateInfo)
+        {
+            if (_Tempertur > 0)
+            {
+                Console.WriteLine($"Save ph with value {_PH}");
+
+                var localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
+                localConn.Open();
+
+                Helper.SaveChannelValue(localConn, "ph", _PH);
+
+                localConn.Close();
+                localConn.Dispose();
+            }
+            else
+            {
+                Console.WriteLine($"Do not save pH if it is 0");
+            }
+
+        }
+
 
 
 

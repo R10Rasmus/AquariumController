@@ -113,3 +113,4 @@ C:\Projekter\PI\c#\AquariumController\InfoPages\bin\System.ValueTuple.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.pdb
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\UnitsNet.xml
 C:\Projekter\PI\c#\AquariumController\InfoPages\bin\Content\Site.css
+C:\Projekter\PI\c#\AquariumController\InfoPages\obj\Release\InfoPages.csprojAssemblyReference.cache

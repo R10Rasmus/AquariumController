@@ -97,59 +97,29 @@ namespace InfoPages.Controllers
             return View(ReadTemperatureValues());
         }
 
+        public ActionResult PH()
+        {
+
+            return View();
+        }
+
         public ActionResult TemperatureData(EnumTimeSpan? timeSpan)
         {
 
-            List<DataPoint> dataPoints = new List<DataPoint>();
-
-            MySqlConnection conn = OpenConnection();
-
-            string where = String.Empty;
-            if (timeSpan.HasValue)
-            {
-                where = " WHERE  (created_at > '";
-                switch (timeSpan.Value)
-                {
-                    case EnumTimeSpan.OneHour:
-                        where = where + DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd HH:mm:ss");
-                        break;
-                    case EnumTimeSpan.OneDay:
-                        where = where + DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss");
-                        break;
-                    case EnumTimeSpan.OneWeek:
-                        where = where + DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd HH:mm:ss");
-                        break;
-                    case EnumTimeSpan.OneMonth:
-                        where = where + DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd HH:mm:ss");
-                        break;
-                    case EnumTimeSpan.OneYear:
-                        where = where + DateTime.Now.AddYears(-1).ToString("yyyy-MM-dd HH:mm:ss");
-                        break;
-                }
-                where += "')";
-            }
-
-
-            MySqlCommand cmd = new MySqlCommand
-            {
-                CommandText = "SELECT value, created_at FROM temperature" + where,
-                Connection = conn
-            };
-
-            var rdr = cmd.ExecuteReader();
-
-            while (rdr.Read())
-            {
-                dataPoints.Add(new DataPoint(DateTime.Parse(rdr["created_at"].ToString()), double.Parse(rdr["value"].ToString())));
-            }
-
-            rdr.Close();
-            conn.Close();
-
             JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
-            return Content(JsonConvert.SerializeObject(dataPoints, _jsonSetting), "application/json");
+            return Content(JsonConvert.SerializeObject(GetData(timeSpan, "temperature"), _jsonSetting), "application/json");
 
         }
+
+        public ActionResult PHData(EnumTimeSpan? timeSpan)
+        {
+
+            JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+            return Content(JsonConvert.SerializeObject(GetData(timeSpan, "ph"), _jsonSetting), "application/json");
+
+        }
+
+
 
         public ActionResult CPUTemperature()
         {
@@ -202,6 +172,62 @@ namespace InfoPages.Controllers
             conn.Close();
 
             return new Graph() { Max = _temperatureMax, Min = _temperatureMin };
+        }
+
+        private static string GetWhereFromTimeSpan(EnumTimeSpan? timeSpan)
+        {
+            string where = String.Empty;
+            if (timeSpan.HasValue)
+            {
+                where = " WHERE  (created_at > '";
+                switch (timeSpan.Value)
+                {
+                    case EnumTimeSpan.OneHour:
+                        where = where + DateTime.Now.AddHours(-1).ToString("yyyy-MM-dd HH:mm:ss");
+                        break;
+                    case EnumTimeSpan.OneDay:
+                        where = where + DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd HH:mm:ss");
+                        break;
+                    case EnumTimeSpan.OneWeek:
+                        where = where + DateTime.Now.AddDays(-7).ToString("yyyy-MM-dd HH:mm:ss");
+                        break;
+                    case EnumTimeSpan.OneMonth:
+                        where = where + DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd HH:mm:ss");
+                        break;
+                    case EnumTimeSpan.OneYear:
+                        where = where + DateTime.Now.AddYears(-1).ToString("yyyy-MM-dd HH:mm:ss");
+                        break;
+                }
+                where += "')";
+            }
+
+            return where;
+        }
+
+        private static List<DataPoint> GetData(EnumTimeSpan? timeSpan, string tableName)
+        {
+            List<DataPoint> dataPoints = new List<DataPoint>();
+
+            MySqlConnection conn = OpenConnection();
+            string where = GetWhereFromTimeSpan(timeSpan);
+
+            MySqlCommand cmd = new MySqlCommand
+            {
+                CommandText = "SELECT value, created_at FROM " + tableName + where,
+                Connection = conn
+            };
+
+            var rdr = cmd.ExecuteReader();
+
+            while (rdr.Read())
+            {
+                dataPoints.Add(new DataPoint(DateTime.Parse(rdr["created_at"].ToString()), double.Parse(rdr["value"].ToString())));
+            }
+
+            rdr.Close();
+            conn.Close();
+
+            return dataPoints;
         }
     }
 }

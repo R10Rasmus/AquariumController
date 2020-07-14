@@ -18,3 +18,4 @@ C:\Projekter\PI\c#\AquariumController\OneWire\obj\Release\OneWire.csproj.CoreCom
 C:\Projekter\PI\c#\AquariumController\OneWire\obj\Release\OneWire.csproj.CopyComplete
 C:\Projekter\PI\c#\AquariumController\OneWire\obj\Release\OneWire.dll
 C:\Projekter\PI\c#\AquariumController\OneWire\obj\Release\OneWire.pdb
+C:\Projekter\PI\c#\AquariumController\OneWire\obj\Release\OneWire.csprojAssemblyReference.cache
