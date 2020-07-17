@@ -19,16 +19,18 @@ namespace AquariumController
     {
         const double _TemperturCalibrateOffSet = 0.6;
 
-        const int AIRPUMPPIN = 12;
+        const int AIRPUMPPIN = 01;
 
         const int LCDRSPIN = 07;
         const int LCDENABLEPIN = 08;
-        static readonly int[] LCDDATA = { 25, 24, 23, 18 };
+        static readonly int[] LCDDATA = { 06, 13, 19, 26 };
 
         const int BUSID = 1;
         const int I2CADDRESS = 0x3F;
 
         static double _Tempertur = 0;
+        static double _TemperatureMin = 0;
+        static double _TemperatureMax = 0;
         static double _PH = 0;
         static bool _AirPumpOnOff = false;
         static bool _TimerAirPumpOnOff = false;
@@ -53,14 +55,15 @@ namespace AquariumController
             MySqlConnection conn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
             conn.Open();
 
-            SetupMaxMinTemperature(out int _temperatureMax, out int _temperatureMin, conn);
-
-            SetupAirPumpStartStopTime(conn);
-
             SetupHeater(conn, out ILocalHueClient client, out Light aquariumHeater);
+
+          //  readSetup(new object());
 
             Timer saveTemperturTimer = SetupSaveInterval(conn, "TemperatureSaveInterval", saveTempertur);
             Timer savePhTimer = SetupSaveInterval(conn, "PHSaveInterval", savePh);
+
+            AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);
+            Timer readSetupTimer = new Timer(readSetup, saveTemperturAutoResetEvent, 5000, 1 * 60 * 1000);
 
             _Controller = new GpioController();
             _Controller.OpenPin(AIRPUMPPIN, PinMode.Output);
@@ -86,17 +89,19 @@ namespace AquariumController
                 {
                     _Tempertur = getTempertur(Helper.GetSettingFromDb(conn, "WaterTemperatureId"));
 
-                    //_PH = Math.Round(uFire_pH.MeasurepH(Convert.ToSingle(_Tempertur)), 1);
+                    _PH = Math.Round(uFire_pH.MeasurepH(Convert.ToSingle(_Tempertur)), 1);
 
-                    string tempterturText = Math.Round(_Tempertur, 0).ToString() + (char)SetCharacters.TemperatureCharactersNumber;
+                    string tempterturText = Math.Round(_Tempertur, 1, MidpointRounding.AwayFromZero).ToString() + (char)SetCharacters.TemperatureCharactersNumber;
 
-                    //string pHText = _PH+"pH";
+                    string pHText = _PH + "pH";
 
-                    //console.ReplaceLine(0, tempterturText+" "+ pHText);
+                    console.ReplaceLine(0, tempterturText + " " + pHText);
 
                     Animation.ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
 
-                    HeaterControl(_temperatureMax, _temperatureMin, client, aquariumHeater, _Tempertur, console);
+                   // Console.WriteLine("_fishCount:" + _fishCount + " _revers:+" + _revers + " _positionCount:" + _positionCount);
+
+                    HeaterControl(client, aquariumHeater, _Tempertur, console);
 
                     SetAirPumpOnOff(conn);
                     AirPumpOnOff(conn);
@@ -109,6 +114,7 @@ namespace AquariumController
 
             saveTemperturTimer.Dispose();
             savePhTimer.Dispose();
+            readSetupTimer.Dispose();
 
             conn.Close();
             conn.Dispose();
@@ -118,51 +124,52 @@ namespace AquariumController
 
         }
 
-        private static System.Threading.Timer SetupSaveInterval(MySqlConnection conn, string SettingFromDb, TimerCallback callback)
+        private static Timer SetupSaveInterval(MySqlConnection conn, string SettingFromDb, TimerCallback callback)
         {
             // Create saver tempertur timer
             int saveTemperturIntervaleInMin = int.Parse(Helper.GetSettingFromDb(conn, SettingFromDb));
             Console.WriteLine($"{SettingFromDb} is {saveTemperturIntervaleInMin}");
 
-            AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);
-            System.Threading.Timer saveTemperturTimer = new System.Threading.Timer(callback, saveTemperturAutoResetEvent, 5000, saveTemperturIntervaleInMin * 60 * 1000);
-            return saveTemperturTimer;
+            AutoResetEvent saveAutoResetEvent = new AutoResetEvent(false);
+            System.Threading.Timer saveTimer = new System.Threading.Timer(callback, saveAutoResetEvent, 5000, saveTemperturIntervaleInMin * 60 * 1000);
+            return saveTimer;
         }
+
+
 
         private static void SetupAirPumpStartStopTime(MySqlConnection conn)
         {
-            string time = Helper.GetSettingFromDb(conn, "AirPumpStart");
-            if (!string.IsNullOrWhiteSpace(time))
+            string timeStart = Helper.GetSettingFromDb(conn, "AirPumpStart");
+            string timeStop = Helper.GetSettingFromDb(conn, "AirPumpStop");
+
+            if (!string.IsNullOrWhiteSpace(timeStart))
             {
-                string[] timeSpil = time.Split(':');
-
-                new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, int.Parse(timeSpil[0]), int.Parse(timeSpil[1]), 0);
-
-                _AirPumpStart = DateTime.Parse(Helper.GetSettingFromDb(conn, "AirPumpStart"));
+                _AirPumpStart = DateTime.Parse(timeStart);
 
                 Console.WriteLine($"AirPumpStart is {_AirPumpStart.TimeOfDay}");
             }
 
-            time = Helper.GetSettingFromDb(conn, "AirPumpStop");
-            if (!string.IsNullOrWhiteSpace(time))
+            if (!string.IsNullOrWhiteSpace(timeStop))
             {
-                string[] timeSpil = time.Split(':');
+                _AirPumpStop = DateTime.Parse(timeStop);
 
-                new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, int.Parse(timeSpil[0]), int.Parse(timeSpil[1]), 0);
-
-                _AirPumpStop = DateTime.Parse(Helper.GetSettingFromDb(conn, "AirPumpStop"));
-
-                Console.WriteLine($"AirPumpStop is {_AirPumpStart.TimeOfDay}");
+                Console.WriteLine($"AirPumpStop is {_AirPumpStop.TimeOfDay}");
             }
         }
 
-        private static void SetupMaxMinTemperature(out int _temperatureMax, out int _temperatureMin, MySqlConnection conn)
+        private static void SetupMaxMinTemperature(MySqlConnection conn)
         {
-            _temperatureMax = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureMax"));
-            Console.WriteLine($"TemperatureMax is {_temperatureMax}");
+            int maxTmp = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureMax"));
+            int minTmp = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureMin"));
+            if ((maxTmp != _TemperatureMax) || (minTmp  != _TemperatureMin))
+            {
+                _TemperatureMax = maxTmp;
+                Console.WriteLine($"TemperatureMax is {_TemperatureMax}");
 
-            _temperatureMin = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureMin"));
-            Console.WriteLine($"TemperatureMin is {_temperatureMin}");
+                _TemperatureMin = minTmp;
+                Console.WriteLine($"TemperatureMin is {_TemperatureMin}");
+            }
+          
         }
 
         private static void SetupHeater(MySqlConnection conn, out ILocalHueClient client, out Light aquariumHeater)
@@ -253,7 +260,7 @@ namespace AquariumController
         }
         private static void savePh(Object stateInfo)
         {
-            if (_Tempertur > 0)
+            if (_PH > 0)
             {
                 Console.WriteLine($"Save ph with value {_PH}");
 
@@ -272,6 +279,19 @@ namespace AquariumController
 
         }
 
+        private static void readSetup(Object stateInfo)
+        {
+            Console.WriteLine("Read settings...");
+            var localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
+            localConn.Open();
+
+            SetupMaxMinTemperature(localConn);
+
+            SetupAirPumpStartStopTime(localConn);
+
+            localConn.Close();
+            localConn.Dispose();
+        }
 
 
 
@@ -289,13 +309,13 @@ namespace AquariumController
             return 0;
         }
 
-        private static void HeaterControl(int _temperatureMax, int _temperatureMin, ILocalHueClient client, Light aquariumHeater, double _temperature, LcdConsole console)
+        private static void HeaterControl(ILocalHueClient client, Light aquariumHeater, double _temperature, LcdConsole console)
         {
             //if the system has an heater and a temperature
             if (aquariumHeater != null && _temperature >0)
             {
                 //if temperature is over max, then turn off heater
-                if (_temperature > _temperatureMax)
+                if (_temperature > _TemperatureMax)
                 {
                     LightCommand lightCommand = new LightCommand() { On = false };
                     client.SendCommandAsync(lightCommand, new List<string> { aquariumHeater.Id });
@@ -306,7 +326,7 @@ namespace AquariumController
                 }
 
                 //if temperature is under min, then turn on heater
-                if (_temperature < _temperatureMin)
+                if (_temperature < _TemperatureMin)
                 {
                     LightCommand lightCommand = new LightCommand() { On = true };
                     client.SendCommandAsync(lightCommand, new List<string> { aquariumHeater.Id });

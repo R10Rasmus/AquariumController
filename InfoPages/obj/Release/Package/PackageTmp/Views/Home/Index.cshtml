@@ -1,0 +1,120 @@
+﻿@using InfoPages.Models
+@model Graph
+
+@{
+    ViewBag.Title = "Dashboard";
+}
+<head>
+    <script src="/bundles/jquery" type="text/javascript"></script>
+
+    <script>
+
+
+        window.onload = function () {
+            var TemperatureDps = [];
+            var PhDps = [];
+
+            var temperatureChart = new CanvasJS.Chart("chartTemperatureContainer", {
+                theme: "light2",
+                animationEnabled: true,
+                zoomEnabled: true,
+                toolTip: {
+                    contentFormatter: function (e) {
+                        var content = "";
+                        for (var i = 0; i < e.entries.length; i++) {
+                            content = CanvasJS.formatDate(e.entries[i].dataPoint.x, "HH:mm DD/MM/YYYY") + " " + e.entries[i].dataPoint.y + "C";
+                        }
+                        return content;
+                    }
+                },
+                axisX: {
+                    valueFormatString: "HH:mm",
+                    labelAngle: -50
+                },
+                axisY: {
+                    stripLines: [
+                        {
+                            value: @Model.Max,
+                            color: "red"
+                        }, {
+                            value: @Model.Min,
+                            color: "red"
+                        }],
+                    minimum: 20,
+                    valueFormatString: "####"
+                },
+                title: {
+                    text: "Temperature"
+                },
+                data: [{
+                    type: "line",
+                    xValueType: "dateTime",
+                    dataPoints: TemperatureDps
+                }]
+            });
+
+            var phChart = new CanvasJS.Chart("chartPhContainer", {
+                theme: "light2",
+                animationEnabled: true,
+                zoomEnabled: true,
+                toolTip: {
+                    contentFormatter: function (e) {
+                        var content = "";
+                        for (var i = 0; i < e.entries.length; i++) {
+                            content = CanvasJS.formatDate(e.entries[i].dataPoint.x, "HH:mm DD/MM/YYYY") + " " + e.entries[i].dataPoint.y + "CpH";
+                        }
+                        return content;
+                    }
+                },
+                axisX: {
+                    valueFormatString: "HH:mm",
+                    labelAngle: -50
+                },
+                axisY: {
+                    valueFormatString: "####"
+                },
+                title: {
+                    text: "pH"
+                },
+                data: [{
+                    type: "line",
+                    xValueType: "dateTime",
+                    dataPoints: PhDps
+                }]
+            });
+
+            $.getJSON("/home/TemperatureData?timeSpan=1", addDataTemperature);
+            $.getJSON("/home/PHData?timeSpan=1", addDataPH);
+
+
+            function addDataTemperature(data) {
+                for (var i = 0; i < data.length; i++) {
+                    TemperatureDps.push({
+                        x: new Date(data[i].X),
+                        y: data[i].Y
+                    });
+                }
+                temperatureChart.render();
+            }
+
+            function addDataPH(data) {
+                for (var i = 0; i < data.length; i++) {
+                    PhDps.push({
+                        x: new Date(data[i].X),
+                        y: data[i].Y
+                    });
+                }
+                phChart.render();
+            }
+        }
+
+    </script>
+</head>
+
+<div class="col-md-12">
+    <div class="row">
+        <div id="chartTemperatureContainer" style="width:100%;height:410px"></div>
+        <div id="chartPhContainer" style="width:100%;height:410px"></div>
+    </div>
+
+</div>

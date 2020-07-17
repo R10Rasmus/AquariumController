@@ -26,12 +26,14 @@ C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\System.Secu
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\System.Threading.Tasks.Extensions.dll
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\System.ValueTuple.dll
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Ubiety.Dns.Core.dll
+C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\uFire_ISE.dll
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\UnitsNet.dll
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Zstandard.Net.dll
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Lcd1602Controller.pdb
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Lcd1602Controller.dll.config
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\OneWire.pdb
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\OneWire.dll.config
+C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\uFire_ISE.pdb
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Google.Protobuf.pdb
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Google.Protobuf.xml
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\K4os.Compression.LZ4.xml
@@ -58,5 +60,3 @@ C:\Projekter\PI\c#\AquariumController\AquariumController\obj\Release\AquariumCon
 C:\Projekter\PI\c#\AquariumController\AquariumController\obj\Release\AquariumController.csproj.CopyComplete
 C:\Projekter\PI\c#\AquariumController\AquariumController\obj\Release\AquariumController.exe
 C:\Projekter\PI\c#\AquariumController\AquariumController\obj\Release\AquariumController.pdb
-C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\uFire_ISE.dll
-C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\uFire_ISE.pdb

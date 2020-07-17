@@ -1,0 +1,11 @@
+C:\Projekter\PI\c#\AquariumController\uFire_ISE\bin\Debug\netstandard2.0\uFire_ISE.deps.json
+C:\Projekter\PI\c#\AquariumController\uFire_ISE\bin\Debug\netstandard2.0\uFire_ISE.dll
+C:\Projekter\PI\c#\AquariumController\uFire_ISE\bin\Debug\netstandard2.0\uFire_ISE.pdb
+C:\Projekter\PI\c#\AquariumController\uFire_ISE\bin\Debug\netstandard2.0\System.Device.Gpio.dll
+C:\Projekter\PI\c#\AquariumController\uFire_ISE\obj\Debug\netstandard2.0\uFire_ISE.csprojAssemblyReference.cache
+C:\Projekter\PI\c#\AquariumController\uFire_ISE\obj\Debug\netstandard2.0\uFire_ISE.AssemblyInfoInputs.cache
+C:\Projekter\PI\c#\AquariumController\uFire_ISE\obj\Debug\netstandard2.0\uFire_ISE.AssemblyInfo.cs
+C:\Projekter\PI\c#\AquariumController\uFire_ISE\obj\Debug\netstandard2.0\uFire_ISE.csproj.CoreCompileInputs.cache
+C:\Projekter\PI\c#\AquariumController\uFire_ISE\obj\Debug\netstandard2.0\uFire_ISE.csproj.CopyComplete
+C:\Projekter\PI\c#\AquariumController\uFire_ISE\obj\Debug\netstandard2.0\uFire_ISE.dll
+C:\Projekter\PI\c#\AquariumController\uFire_ISE\obj\Debug\netstandard2.0\uFire_ISE.pdb

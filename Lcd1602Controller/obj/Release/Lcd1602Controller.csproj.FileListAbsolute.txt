@@ -15,4 +15,3 @@ C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\obj\Release\Lcd1602Contr
 C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\obj\Release\Lcd1602Controller.csproj.CopyComplete
 C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\obj\Release\Lcd1602Controller.dll
 C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\obj\Release\Lcd1602Controller.pdb
-C:\Projekter\PI\c#\AquariumController\Lcd1602Controller\obj\Release\Lcd1602Controller.csprojAssemblyReference.cache

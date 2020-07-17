@@ -1,0 +1,79 @@
+﻿@using InfoPages.Models
+@model Graph
+
+@{
+    ViewBag.Title = "Temperature";
+}
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <script src="/bundles/jquery" type="text/javascript"></script>
+
+    <script>
+
+
+        window.onload = function () {
+            var dps = [];
+
+            var chart = new CanvasJS.Chart("chartContainer", {
+                theme: "light2", // "light1", "light2", "dark1", "dark2"
+                animationEnabled: true,
+                zoomEnabled: true,
+                title: {
+                    text: "Temperature"
+                },
+                toolTip: {
+                    contentFormatter: function (e) {
+                        var content = "";
+                        for (var i = 0; i < e.entries.length; i++) {
+                            content = CanvasJS.formatDate(e.entries[i].dataPoint.x, "HH:mm DD/MM/YYYY") + " " + e.entries[i].dataPoint.y + "C";
+                        }
+                        return content;
+                    }
+                },
+                axisX: {
+                    valueFormatString: "DD-MM-YY HH:mm",
+                    labelAngle: -50
+                },
+                  axisY: {
+                    stripLines: [
+                        {
+                            value: @Model.Max,
+                            color: "red"
+                        }, {
+                            value: @Model.Min,
+                            color: "red"
+                          }],
+                      minimum: 20,
+                    valueFormatString: "####"
+                },
+                data: [{
+                    type: "line",
+                    xValueType: "dateTime",
+                    dataPoints: dps,
+
+                }]
+            });
+
+            $.getJSON("/home/TemperatureData", addData);
+
+
+            function addData(data) {
+                for (var i = 0; i < data.length; i++) {
+                    dps.push({
+                        x: new Date(data[i].X),
+                        y: data[i].Y
+                    });
+                }
+                chart.render();
+            }
+        }
+
+    </script>
+</head>
+<body>
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+
+</body>
+</html>                         
