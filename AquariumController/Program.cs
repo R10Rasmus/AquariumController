@@ -33,7 +33,7 @@ namespace AquariumController
         static double _TemperatureMax = 0;
         static double _PH = 0;
         static bool _AirPumpOnOff = false;
-        static bool _TimerAirPumpOnOff = false;
+        static bool? _TimerAirPumpOnOff = null;
 
 
         static DateTime _AirPumpStart;
@@ -88,6 +88,8 @@ namespace AquariumController
                 while (!Console.KeyAvailable)
                 {
                     _Tempertur = getTempertur(Helper.GetSettingFromDb(conn, "WaterTemperatureId"));
+                    
+                    uFire_pH.SetTemp(Convert.ToSingle(_Tempertur));
 
                     _PH = Math.Round(uFire_pH.MeasurepH(Convert.ToSingle(_Tempertur)), 1);
 
@@ -98,8 +100,6 @@ namespace AquariumController
                     console.ReplaceLine(0, tempterturText + " " + pHText);
 
                     Animation.ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
-
-                   // Console.WriteLine("_fishCount:" + _fishCount + " _revers:+" + _revers + " _positionCount:" + _positionCount);
 
                     HeaterControl(client, aquariumHeater, _Tempertur, console);
 
@@ -189,26 +189,28 @@ namespace AquariumController
             aquariumHeater = lights.FirstOrDefault(t => t.Name == Helper.GetSettingFromDb(conn, "HeaterName"));
         }
 
+        //fixme make this a time runnig only running when it needs to, on the time of _AirPumpStart or _AirPumpStop
         private static void SetAirPumpOnOff(MySqlConnection conn)
         {
-            if (DateTime.Now.TimeOfDay >= _AirPumpStart.TimeOfDay)
+            if (DateTime.Now.TimeOfDay >= _AirPumpStart.TimeOfDay && DateTime.Now.TimeOfDay  < _AirPumpStop.TimeOfDay)
             {
-                if(_TimerAirPumpOnOff != true)
+                if (_TimerAirPumpOnOff != true)
                 {
                     _TimerAirPumpOnOff = true;
                     Helper.SaveSettingValue(conn, "airPumpOnOff", true.ToString());
                 }
                 
             }
-
-            if (DateTime.Now.TimeOfDay >= _AirPumpStop.TimeOfDay)
+            else
             {
+
                 if (_TimerAirPumpOnOff != false)
                 {
                     _TimerAirPumpOnOff = false;
                     Helper.SaveSettingValue(conn, "airPumpOnOff", false.ToString());
                 }
             }
+
         }
 
         private static void AirPumpOnOff(MySqlConnection conn)
