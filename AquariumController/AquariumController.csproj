@@ -173,6 +173,11 @@
     <Compile Include="DB\Helper.cs" />
     <Compile Include="Display\Animation.cs" />
     <Compile Include="Display\SetCharacters.cs" />
+    <Compile Include="Helper\AirPump.cs" />
+    <Compile Include="Helper\Heater.cs" />
+    <Compile Include="Helper\Ph.cs" />
+    <Compile Include="Helper\Settings.cs" />
+    <Compile Include="Helper\Tempertur.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

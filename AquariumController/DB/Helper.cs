@@ -5,6 +5,7 @@ namespace AquariumController.DB
 {
     public class Helper
     {
+
         public static string GetSettingFromDb(MySqlConnection conn, string settingName)
         {
             MySqlCommand cmd = new MySqlCommand
