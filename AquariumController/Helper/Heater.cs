@@ -10,6 +10,7 @@ namespace AquariumController.Helper
 {
     public static class Heater
     {
+        private static DateTime _lastturnOnOff = new DateTime();
         static bool _HeaterOnOff = false;
 
         public static void SetupHeater(MySqlConnection conn, out ILocalHueClient client, out Light aquariumHeater)
@@ -62,7 +63,8 @@ namespace AquariumController.Helper
         public static void SetHeaterControlOnOff(MySqlConnection conn, double _temperature, LcdConsole console)
         {
             //if the system has an heater and a temperature
-            if (_temperature > 0)
+            //and if it is more then 5 min since it last was turned on/off, sow we do not now turn on off if the temperature is around max/min
+            if (_temperature > 0 && _lastturnOnOff.AddMinutes(5) < DateTime.Now)
             {
                 //if temperature is over max, then turn off heater
                 if (_temperature > Tempertur.TemperatureMax)
@@ -70,13 +72,17 @@ namespace AquariumController.Helper
                     DB.Helper.SaveSettingValue(conn, "HeaterOnOff", false.ToString());
 
                     console.BlinkDisplay(2);
+
+                    _lastturnOnOff = DateTime.Now;
                 }
 
                 //if temperature is under min, then turn on heater
                 if (_temperature < Tempertur.TemperatureMin)
                 {
                     DB.Helper.SaveSettingValue(conn, "HeaterOnOff", true.ToString());
-                    
+
+                    _lastturnOnOff = DateTime.Now;
+
                 }
             }
         }
