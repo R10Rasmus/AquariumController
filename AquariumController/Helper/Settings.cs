@@ -1,11 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AquariumController.Helper
 {
@@ -14,6 +10,7 @@ namespace AquariumController.Helper
 
         public static Timer SetupSaveInterval(MySqlConnection conn, string SettingFromDb, TimerCallback callback)
         {
+
             // Create saver tempertur timer
             int saveTemperturIntervaleInMin = int.Parse(DB.Helper.GetSettingFromDb(conn, SettingFromDb));
             Console.WriteLine($"{SettingFromDb} is {saveTemperturIntervaleInMin}");

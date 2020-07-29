@@ -36,13 +36,11 @@ namespace AquariumController
             Console.WriteLine("Setting up UFire EC Probe...");
             Iot.Device.UFire.UFire_pH uFire_pH = new Iot.Device.UFire.UFire_pH(device);
 
-            Console.WriteLine("Setting up MySql db");
+            Console.WriteLine("Setting up MySql db....");
             MySqlConnection conn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
             conn.Open();
 
             Heater.SetupHeater(conn, out ILocalHueClient client, out Light aquariumHeater);
-
-          //  readSetup(new object());
 
             Timer saveTemperturTimer = Settings.SetupSaveInterval(conn, "TemperatureSaveInterval", Tempertur.SaveTempertur);
             Timer savePhTimer = Settings.SetupSaveInterval(conn, "PHSaveInterval", Ph.SavePh);
@@ -50,6 +48,7 @@ namespace AquariumController
             AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);
             Timer readSetupTimer = new Timer(Settings.ReadSetup, saveTemperturAutoResetEvent, 5000, 1 * 60 * 1000);
 
+            Console.WriteLine("Setting up GpioController....");
             _Controller = new GpioController();
             _Controller.OpenPin(AIRPUMPPIN, PinMode.Output);
 

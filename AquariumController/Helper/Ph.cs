@@ -1,18 +1,25 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AquariumController.Helper
 {
     public static class Ph
     {
+
         public static double PH = 0;
+
+        static bool _isFirstSave = true;
         public static void SavePh(Object stateInfo)
         {
+            //do not save first value, pH value needs to stabilize
+            if (_isFirstSave)
+            {
+                _isFirstSave = false;
+                Console.WriteLine($"Do not save first pH value, value is {PH}");
+                return;
+            }
+
             if (PH > 0)
             {
                 Console.WriteLine($"Save ph with value {PH}");

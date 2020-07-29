@@ -67,8 +67,7 @@ namespace AquariumController.Helper
                 //if temperature is over max, then turn off heater
                 if (_temperature > Tempertur.TemperatureMax)
                 {
-                    _HeaterOnOff = true;    
-                    DB.Helper.SaveSettingValue(conn, "HeaterOnOff", true.ToString());
+                    DB.Helper.SaveSettingValue(conn, "HeaterOnOff", false.ToString());
 
                     console.BlinkDisplay(2);
                 }
@@ -76,9 +75,8 @@ namespace AquariumController.Helper
                 //if temperature is under min, then turn on heater
                 if (_temperature < Tempertur.TemperatureMin)
                 {
-
-                    _HeaterOnOff = false;
-                    DB.Helper.SaveSettingValue(conn, "HeaterOnOff", false.ToString());
+                    DB.Helper.SaveSettingValue(conn, "HeaterOnOff", true.ToString());
+                    
                 }
             }
         }
