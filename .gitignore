@@ -9,3 +9,5 @@
 /Lcd1602Controller/bin/Debug
 /Lcd1602Controller/obj/Debug
 /packages
+/InfoPages/bin
+/InfoPages/obj/Release

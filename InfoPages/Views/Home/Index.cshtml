@@ -40,8 +40,9 @@
                             value: @Model.Min,
                             color: "red"
                         }],
-                    minimum: 23,
-                    valueFormatString: "####"
+                      minimum: @(Model.Min - 1),
+                      maximum:@(Model.Max + 1),
+                    valueFormatString: "##.0"
                 },
                 title: {
                     text: "Temperature"
@@ -72,7 +73,7 @@
                 },
                 axisY: {
                     minimum: 5,
-                    valueFormatString: "####"
+                    valueFormatString: "##.0"
                 },
                 title: {
                     text: "pH"
