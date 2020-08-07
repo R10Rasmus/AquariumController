@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using AquariumController.Extension;
+using MySql.Data.MySqlClient;
 using System;
 using System.Configuration;
 using System.Threading;
@@ -13,10 +14,10 @@ namespace AquariumController.Helper
 
             // Create saver tempertur timer
             int saveTemperturIntervaleInMin = int.Parse(DB.Helper.GetSettingFromDb(conn, SettingFromDb));
-            Console.WriteLine($"{SettingFromDb} is {saveTemperturIntervaleInMin}");
+            ConsoleEx.WriteLineWithDate($"{SettingFromDb} is {saveTemperturIntervaleInMin}");
 
             AutoResetEvent saveAutoResetEvent = new AutoResetEvent(false);
-            System.Threading.Timer saveTimer = new System.Threading.Timer(callback, saveAutoResetEvent, 5000, saveTemperturIntervaleInMin * 60 * 1000);
+            Timer saveTimer = new Timer(callback, saveAutoResetEvent, 5000, saveTemperturIntervaleInMin * 60 * 1000);
             return saveTimer;
         }
 
@@ -27,13 +28,15 @@ namespace AquariumController.Helper
 
         public static void ReadSetup(Object stateInfo)
         {
-            Console.WriteLine("Read settings...");
+            ConsoleEx.WriteLineWithDate("Read settings...");
             var localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
             localConn.Open();
 
             Tempertur.SetupMaxMinTemperature(localConn);
 
             AirPump.SetupAirPumpStartStopTime(localConn);
+            AirPump.SetupAirPumpFeedingStop(localConn);
+
 
             localConn.Close();
             localConn.Dispose();

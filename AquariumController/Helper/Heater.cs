@@ -1,4 +1,5 @@
-﻿using Lcd1602Controller;
+﻿using AquariumController.Extension;
+using Lcd1602Controller;
 using MySql.Data.MySqlClient;
 using Q42.HueApi;
 using Q42.HueApi.Interfaces;
@@ -8,14 +9,17 @@ using System.Linq;
 
 namespace AquariumController.Helper
 {
-    public static class Heater
+    public class Heater
     {
         private static DateTime _lastturnOnOff = new DateTime();
-        static bool _HeaterOnOff = false;
+        private bool _HeaterOnOff = false;
 
-        public static void SetupHeater(MySqlConnection conn, out ILocalHueClient client, out Light aquariumHeater)
+        private readonly ILocalHueClient client;
+        private readonly Light aquariumHeater;
+
+        public Heater(MySqlConnection conn)
         {
-            Console.WriteLine($"Getting PhilipsHue Lights...");
+            ConsoleEx.WriteLineWithDate($"Getting PhilipsHue Lights...");
 
             client = new LocalHueClient(DB.Helper.GetSettingFromDb(conn, "PhilipsHueIp"));
             client.Initialize(DB.Helper.GetSettingFromDb(conn, "PhilipsHuePersonalAppKey"));
@@ -24,13 +28,16 @@ namespace AquariumController.Helper
 
             foreach (Light item in lights)
             {
-                Console.WriteLine("name:" + item.Name + " id:" + item.Id);
+                ConsoleEx.WriteLineWithDate("name:" + item.Name + " id:" + item.Id);
             }
 
             aquariumHeater = lights.FirstOrDefault(t => t.Name == DB.Helper.GetSettingFromDb(conn, "HeaterName"));
+
+            //make sure heater is turned off at startup
+            TurnHeaterOnOff(false);
         }
 
-        public static void HeaterOnOff(MySqlConnection conn, ILocalHueClient client, Light aquariumHeater)
+        public void HeaterOnOff(MySqlConnection conn)
         {
 
             if (bool.TryParse(DB.Helper.GetSettingFromDb(conn, "HeaterOnOff"), out bool result) && aquariumHeater != null)
@@ -41,18 +48,11 @@ namespace AquariumController.Helper
 
                     if (result)
                     {
-
-                        LightCommand lightCommand = new LightCommand() { On = true };
-                        client.SendCommandAsync(lightCommand, new List<string> { aquariumHeater.Id });
-
-                        Console.WriteLine($"Heater on!");
+                        TurnHeaterOnOff(true);
                     }
                     else
                     {
-                        LightCommand lightCommand = new LightCommand() { On = false };
-                        client.SendCommandAsync(lightCommand, new List<string> { aquariumHeater.Id });
-
-                        Console.WriteLine($"Heater off!");
+                        TurnHeaterOnOff(false);
                     }
                 }
 
@@ -85,6 +85,14 @@ namespace AquariumController.Helper
 
                 }
             }
+        }
+
+        private void TurnHeaterOnOff(bool on)
+        {
+            LightCommand lightCommand = new LightCommand() { On = on };
+            client.SendCommandAsync(lightCommand, new List<string> { aquariumHeater.Id });
+
+            ConsoleEx.WriteLineWithDate($"Heater {(on?"on":"off")}!");
         }
     }
 }

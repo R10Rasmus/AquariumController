@@ -1,6 +1,9 @@
-﻿using MySql.Data.MySqlClient;
+﻿using AquariumController.Extension;
+using MySql.Data.MySqlClient;
 using System;
+using System.Collections.Generic;
 using System.Device.Gpio;
+using System.Linq;
 
 namespace AquariumController.Helper
 {
@@ -10,9 +13,11 @@ namespace AquariumController.Helper
 
         static bool? _TimerAirPumpOnOff = null;
 
-
         static DateTime _AirPumpStart;
         static DateTime _AirPumpStop;
+
+        static List<DateTime> _FeedingTimes;
+
 
         public static void SetupAirPumpStartStopTime(MySqlConnection conn)
         {
@@ -23,18 +28,33 @@ namespace AquariumController.Helper
             {
                 _AirPumpStart = DateTime.Parse(timeStart);
 
-                Console.WriteLine($"AirPumpStart is {_AirPumpStart.TimeOfDay}");
+                ConsoleEx.WriteLineWithDate($"AirPumpStart is {_AirPumpStart.TimeOfDay}");
             }
 
             if (!string.IsNullOrWhiteSpace(timeStop))
             {
                 _AirPumpStop = DateTime.Parse(timeStop);
 
-                Console.WriteLine($"AirPumpStop is {_AirPumpStop.TimeOfDay}");
+                ConsoleEx.WriteLineWithDate($"AirPumpStop is {_AirPumpStop.TimeOfDay}");
             }
         }
 
-        //fixme make this a time runnig only running when it needs to, on the time of _AirPumpStart or _AirPumpStop
+        public static void SetupAirPumpFeedingStop(MySqlConnection conn)
+        {
+            string feedingTimes = DB.Helper.GetSettingFromDb(conn, "FeedingTimes");
+
+            string[] feedigTimes = feedingTimes.Split('#');
+
+            _FeedingTimes = new List<DateTime>();
+
+            foreach (string feedingTime in feedigTimes)
+            { 
+                _FeedingTimes.Add(DateTime.Parse(feedingTime));
+                ConsoleEx.WriteLineWithDate($"Add feeding time {feedingTime}");
+            }
+        }
+
+
         public static void SetAirPumpOnOff(MySqlConnection conn)
         {
             if (DateTime.Now.TimeOfDay >= _AirPumpStart.TimeOfDay && DateTime.Now.TimeOfDay < _AirPumpStop.TimeOfDay)
@@ -58,6 +78,24 @@ namespace AquariumController.Helper
 
         }
 
+        public static void SetAirPumpFeedingOff(MySqlConnection conn)
+        {
+            if (_FeedingTimes != null)
+            {
+                //turn off air pump if now is 1 min before any feeding times and 3 med after any feeding times
+                if (_FeedingTimes.Any(t => t.AddMinutes(-1).TimeOfDay <= DateTime.Now.TimeOfDay && DateTime.Now.TimeOfDay < t.AddMinutes(3).TimeOfDay))
+                {
+                    _TimerAirPumpOnOff = false;
+                    DB.Helper.SaveSettingValue(conn, "airPumpOnOff", false.ToString());
+                }
+                else
+                {
+                    _TimerAirPumpOnOff = true;
+                    DB.Helper.SaveSettingValue(conn, "airPumpOnOff", true.ToString());
+                }
+            }
+        }
+
         public static void AirPumpOnOff(MySqlConnection conn, GpioController gpioController, int airPumpPin )
         {
 
@@ -71,19 +109,25 @@ namespace AquariumController.Helper
                     {
 
                         gpioController.Write(airPumpPin, PinValue.High);
-                        Console.WriteLine($"Air pump on!");
+                        ConsoleEx.WriteLineWithDate($"Air pump on!");
                     }
                     else
                     {
                         gpioController.Write(airPumpPin, PinValue.Low);
 
-                        Console.WriteLine($"Air pump off!");
+                        ConsoleEx.WriteLineWithDate($"Air pump off!");
                     }
                 }
 
             }
 
         }
+
+
+
+
+
+
 
     }
 }

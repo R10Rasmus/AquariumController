@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using AquariumController.Extension;
+using MySql.Data.MySqlClient;
 using System;
 using System.Configuration;
 
@@ -16,13 +17,13 @@ namespace AquariumController.Helper
             if (_isFirstSave)
             {
                 _isFirstSave = false;
-                Console.WriteLine($"Do not save first pH value, value is {PH}");
+                ConsoleEx.WriteLineWithDate($"Do not save first pH value, value is {PH}");
                 return;
             }
 
             if (PH > 0)
             {
-                Console.WriteLine($"Save ph with value {PH}");
+                ConsoleEx.WriteLineWithDate($"Save ph with value {PH}");
 
                 var localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
                 localConn.Open();
@@ -34,7 +35,7 @@ namespace AquariumController.Helper
             }
             else
             {
-                Console.WriteLine($"Do not save pH if it is 0");
+                ConsoleEx.WriteLineWithDate($"Do not save pH if it is 0");
             }
 
         }

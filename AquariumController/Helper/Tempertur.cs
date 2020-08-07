@@ -1,4 +1,5 @@
-﻿using Iot.Device.OneWire;
+﻿using AquariumController.Extension;
+using Iot.Device.OneWire;
 using MySql.Data.MySqlClient;
 using System;
 using System.Configuration;
@@ -16,7 +17,7 @@ namespace AquariumController.Helper
         {
             if (TemperturValue > 0)
             {
-                Console.WriteLine($"Save tempertur with value {TemperturValue}");
+                ConsoleEx.WriteLineWithDate($"Save tempertur with value {TemperturValue}");
 
                 var localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
                 localConn.Open();
@@ -28,7 +29,7 @@ namespace AquariumController.Helper
             }
             else
             {
-                Console.WriteLine($"Do not save tempertur if it is 0");
+                ConsoleEx.WriteLineWithDate($"Do not save tempertur if it is 0");
             }
 
         }
@@ -54,10 +55,10 @@ namespace AquariumController.Helper
             if ((maxTmp != TemperatureMax) || (minTmp != TemperatureMin))
             {
                 TemperatureMax = maxTmp;
-                Console.WriteLine($"TemperatureMax is {TemperatureMax}");
+                ConsoleEx.WriteLineWithDate($"TemperatureMax is {TemperatureMax}");
 
                 TemperatureMin = minTmp;
-                Console.WriteLine($"TemperatureMin is {TemperatureMin}");
+                ConsoleEx.WriteLineWithDate($"TemperatureMin is {TemperatureMin}");
             }
 
         }
