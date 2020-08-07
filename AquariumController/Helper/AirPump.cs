@@ -80,23 +80,27 @@ namespace AquariumController.Helper
 
         public static void SetAirPumpFeedingOff(MySqlConnection conn)
         {
-            if (_FeedingTimes != null)
+            //if _TimerAirPumpOnOff is off, then do nothing
+            if (!_TimerAirPumpOnOff.HasValue || !_TimerAirPumpOnOff.Value)
             {
-                //turn off air pump if now is 1 min before any feeding times and 3 med after any feeding times
-                if (_FeedingTimes.Any(t => t.AddMinutes(-1).TimeOfDay <= DateTime.Now.TimeOfDay && DateTime.Now.TimeOfDay < t.AddMinutes(3).TimeOfDay))
+                if (_FeedingTimes != null)
                 {
-                    _TimerAirPumpOnOff = false;
-                    DB.Helper.SaveSettingValue(conn, "airPumpOnOff", false.ToString());
-                }
-                else
-                {
-                    //if _TimerAirPumpOnOff is off, then do not turn the air pump back on
-                    if (!_TimerAirPumpOnOff.HasValue || !_TimerAirPumpOnOff.Value)
+                    //turn off air pump if now is 1 min before any feeding times and 3 med after any feeding times
+                    if (_FeedingTimes.Any(t => t.AddMinutes(-1).TimeOfDay <= DateTime.Now.TimeOfDay && DateTime.Now.TimeOfDay < t.AddMinutes(3).TimeOfDay))
                     {
-                        _TimerAirPumpOnOff = true;
-                        DB.Helper.SaveSettingValue(conn, "airPumpOnOff", true.ToString());
+                        _TimerAirPumpOnOff = false;
+                        DB.Helper.SaveSettingValue(conn, "airPumpOnOff", false.ToString());
                     }
-                  
+                    else
+                    {
+                        //if _TimerAirPumpOnOff is off, then do not turn the air pump back on
+                        if (!_TimerAirPumpOnOff.HasValue || !_TimerAirPumpOnOff.Value)
+                        {
+                            _TimerAirPumpOnOff = true;
+                            DB.Helper.SaveSettingValue(conn, "airPumpOnOff", true.ToString());
+                        }
+
+                    }
                 }
             }
         }
