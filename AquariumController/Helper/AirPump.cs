@@ -90,8 +90,13 @@ namespace AquariumController.Helper
                 }
                 else
                 {
-                    _TimerAirPumpOnOff = true;
-                    DB.Helper.SaveSettingValue(conn, "airPumpOnOff", true.ToString());
+                    //if _TimerAirPumpOnOff is off, then do not turn the air pump back on
+                    if (!_TimerAirPumpOnOff.HasValue || !_TimerAirPumpOnOff.Value)
+                    {
+                        _TimerAirPumpOnOff = true;
+                        DB.Helper.SaveSettingValue(conn, "airPumpOnOff", true.ToString());
+                    }
+                  
                 }
             }
         }
