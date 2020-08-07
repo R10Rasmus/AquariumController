@@ -21,11 +21,6 @@ namespace AquariumController.Helper
             return saveTimer;
         }
 
-
-
-
-
-
         public static void ReadSetup(Object stateInfo)
         {
             ConsoleEx.WriteLineWithDate("Read settings...");

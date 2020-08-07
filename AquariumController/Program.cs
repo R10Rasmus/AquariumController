@@ -96,7 +96,6 @@ namespace AquariumController
                         Heater.SetHeaterControlOnOff(conn, Tempertur.TemperturValue, console);
                         heater.HeaterOnOff(conn);
 
-                        AirPump.SetAirPumpOnOff(conn);
                         AirPump.SetAirPumpFeedingOff(conn);
                         AirPump.AirPumpOnOff(conn,_Controller, AIRPUMPPIN);
 
