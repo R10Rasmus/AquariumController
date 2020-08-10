@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Device.Gpio;
+using System.Globalization;
 using System.Linq;
 using System.Timers;
 
@@ -18,10 +19,11 @@ namespace AquariumController.Helper
         static DateTime _AirPumpStart;
         static DateTime _AirPumpStop;
 
-        static List<DateTime> _FeedingTimes;
-
         static Timer _TimerOff = null;
         static Timer _TimerOn = null;
+
+        static Timer _FeedingOn = null;
+        static Timer _FeedingOff = null;
 
         static bool SetupAirPumpStartStopTimeFirstRun = true;
 
@@ -34,29 +36,50 @@ namespace AquariumController.Helper
             {
                 _AirPumpStart = DateTime.Parse(timeStart);
 
-                if (DateTime.Now.TimeOfDay < _AirPumpStart.TimeOfDay)
+                DateTime baseDate = DateTime.Now;
+
+                //time is tomorrow 
+                if (DateTime.Now.TimeOfDay > _AirPumpStart.TimeOfDay)
                 {
-                    _TimerOff = new Timer((DateTime.Now.TimeOfDay - _AirPumpStart.TimeOfDay).TotalMilliseconds);
+                    baseDate = DateTime.Now.AddDays(1);
+                }
+
+                _AirPumpStart = new DateTime(baseDate.Year, baseDate.Month, baseDate.Day, _AirPumpStart.Hour, _AirPumpStart.Minute, _AirPumpStart.Second);
+
+                if (DateTime.Now < _AirPumpStart)
+                {
+                    _TimerOff = new Timer(Math.Abs((DateTime.Now - _AirPumpStart).TotalMilliseconds));
                     _TimerOff.Elapsed += TimerOn_Elapsed;
                     _TimerOff.Start();
                 }
                 
 
-                ConsoleEx.WriteLineWithDate($"AirPumpStart is {_AirPumpStart.TimeOfDay}");
+                ConsoleEx.WriteLineWithDate($"AirPumpStart is {_AirPumpStart.ToString(CultureInfo.CreateSpecificCulture("da-dk"))}");
             }
 
             if (!string.IsNullOrWhiteSpace(timeStop))
             {
                 _AirPumpStop = DateTime.Parse(timeStop);
 
-                if (DateTime.Now.TimeOfDay < _AirPumpStop.TimeOfDay)
+                DateTime baseDate = DateTime.Now;
+
+                //time is tomorrow 
+                if (DateTime.Now.TimeOfDay > _AirPumpStop.TimeOfDay)
                 {
-                    _TimerOff = new Timer((DateTime.Now.TimeOfDay - _AirPumpStop.TimeOfDay).TotalMilliseconds);
+                    baseDate = DateTime.Now.AddDays(1);
+                }
+
+                _AirPumpStop = new DateTime(baseDate.Year, baseDate.Month, baseDate.Day, _AirPumpStop.Hour, _AirPumpStop.Minute, _AirPumpStop.Second);
+
+
+                if (DateTime.Now < _AirPumpStop)
+                {
+                    _TimerOff = new Timer(Math.Abs((DateTime.Now - _AirPumpStop).TotalMilliseconds));
                     _TimerOff.Elapsed += TimerOff_Elapsed;
                     _TimerOff.Start();
                 }
 
-                ConsoleEx.WriteLineWithDate($"AirPumpStop is {_AirPumpStop.TimeOfDay}");
+                ConsoleEx.WriteLineWithDate($"AirPumpStop is {_AirPumpStop.ToString(CultureInfo.CreateSpecificCulture("da-dk"))}");
             }
 
             if(SetupAirPumpStartStopTimeFirstRun)
@@ -79,80 +102,46 @@ namespace AquariumController.Helper
 
         }
 
-        private static void TimerOn_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            var localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
-            localConn.Open();
-
-            _TimerAirPumpOn = true;
-            DB.Helper.SaveSettingValue(localConn, "airPumpOnOff", true.ToString());
-
-            localConn.Close();
-            localConn.Dispose();
-
-            _TimerOn.Stop();
-        }
-
-
-        private static void TimerOff_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            var localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
-            localConn.Open();
-
-            _TimerAirPumpOn = false;
-            DB.Helper.SaveSettingValue(localConn, "airPumpOnOff", false.ToString());
-
-            Console.WriteLine("4");
-
-            localConn.Close();
-            localConn.Dispose();
-
-            _TimerOff.Stop();
-
-        }
-
-
         public static void SetupAirPumpFeedingStop(MySqlConnection conn)
         {
+
+            double feedingCountDown = 0;
             string feedingTimes = DB.Helper.GetSettingFromDb(conn, "FeedingTimes");
 
             string[] feedigTimes = feedingTimes.Split('#');
 
-            _FeedingTimes = new List<DateTime>();
-
             foreach (string feedingTime in feedigTimes)
-            { 
-                _FeedingTimes.Add(DateTime.Parse(feedingTime));
-                ConsoleEx.WriteLineWithDate($"Add feeding time {feedingTime}");
-            }
-        }
-
-
-        public static void SetAirPumpFeedingOff(MySqlConnection conn)
-        {
-            //if _TimerAirPumpOnOff is off, then do nothing
-            if (_TimerAirPumpOn)
             {
-                if (_FeedingTimes != null)
+                DateTime baseDate = DateTime.Now;
+                DateTime feedingDateTime = DateTime.Parse(feedingTime);
+                //time is tomorrow 
+                if (DateTime.Now.TimeOfDay > feedingDateTime.TimeOfDay)
                 {
-                    //turn off air pump if now is 1 min before any feeding times and 3 med after any feeding times
-                    if (_FeedingTimes.Any(t => t.AddMinutes(-1).TimeOfDay <= DateTime.Now.TimeOfDay && DateTime.Now.TimeOfDay < t.AddMinutes(3).TimeOfDay))
-                    {
-                        DB.Helper.SaveSettingValue(conn, "airPumpOnOff", false.ToString());
-                    }
-                    else
-                    {
-                        //if _TimerAirPumpOnOff is off, then do not turn the air pump back on
-                        if (!_TimerAirPumpOn)
-                        {
-                            DB.Helper.SaveSettingValue(conn, "airPumpOnOff", true.ToString());
+                    baseDate = DateTime.Now.AddDays(1);
+                }
 
-                        }
+                feedingDateTime = new DateTime(baseDate.Year, baseDate.Month, baseDate.Day, feedingDateTime.Hour, feedingDateTime.Minute, feedingDateTime.Second);
 
-                    }
+
+                double countDown = (DateTime.Now - feedingDateTime).TotalMilliseconds;
+
+                if (feedingCountDown==0 || feedingCountDown < countDown)
+                {
+                    feedingCountDown = countDown;
+
+                    ConsoleEx.WriteLineWithDate($"Next feeding time {feedingDateTime.ToString(CultureInfo.CreateSpecificCulture("da-dk"))}");
                 }
             }
+
+            //feeding starter 1 min before set time
+            feedingCountDown += 60000;
+
+            _FeedingOff = new Timer(Math.Abs(feedingCountDown));
+            _FeedingOff.Elapsed += FeedingOff_Elapsed;
+            _FeedingOff.Start();
+
         }
+
 
         public static void AirPumpOnOff(MySqlConnection conn, GpioController gpioController, int airPumpPin )
         {
@@ -179,6 +168,54 @@ namespace AquariumController.Helper
 
             }
 
+        }
+
+        private static void FeedingOn_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            _FeedingOn.Stop();
+            SetAirPumpOnOff(true);
+
+            ConsoleEx.WriteLineWithDate("Feeding mode is off.");
+        }
+
+        private static void FeedingOff_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            _FeedingOff.Stop();
+            SetAirPumpOnOff(false);
+
+            //stop feeding after 4 min.
+            _FeedingOn = new Timer(4 * 60 * 1000);
+            _FeedingOn.Elapsed += FeedingOn_Elapsed;
+            _FeedingOn.Start();
+
+            ConsoleEx.WriteLineWithDate($"Feeding mode is on. It stops in {_FeedingOn.Interval/1000} sec");
+        }
+
+        private static void TimerOn_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            _TimerOn.Stop();
+            SetAirPumpOnOff(true);
+        }
+
+        private static void TimerOff_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            _TimerOff.Stop();
+            SetAirPumpOnOff(false);
+
+
+        }
+
+
+        private static void SetAirPumpOnOff(bool value)
+        {
+            var localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
+            localConn.Open();
+
+            _TimerAirPumpOn = value;
+            DB.Helper.SaveSettingValue(localConn, "airPumpOnOff", value.ToString());
+
+            localConn.Close();
+            localConn.Dispose();
         }
 
 

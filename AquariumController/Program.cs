@@ -50,8 +50,9 @@ namespace AquariumController
             Timer saveTemperturTimer = Settings.SetupSaveInterval(conn, "TemperatureSaveInterval", Tempertur.SaveTempertur);
             Timer savePhTimer = Settings.SetupSaveInterval(conn, "PHSaveInterval", Ph.SavePh);
 
-            AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);
-            Timer readSetupTimer = new Timer(Settings.ReadSetup, saveTemperturAutoResetEvent, 5000, 1 * 60 * 1000);
+            //read setting every 5 minute.
+            AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);          
+            Timer readSetupTimer = new Timer(Settings.ReadSetup, saveTemperturAutoResetEvent, 0, 5 * 60 * 1000);
 
             ConsoleEx.WriteLineWithDate("Setting up GpioController....");
             _Controller = new GpioController();
@@ -81,9 +82,12 @@ namespace AquariumController
                     {
                         Tempertur.TemperturValue = Tempertur.GetTempertur(DB.Helper.GetSettingFromDb(conn, "WaterTemperatureId"));
 
-                        uFire_pH.SetTemp(Convert.ToSingle(Tempertur.TemperturValue));
+                        if (Tempertur.TemperturValue > 0)
+                        {
+                            uFire_pH.SetTemp(Convert.ToSingle(Tempertur.TemperturValue));
 
-                        Ph.PH = Math.Round(uFire_pH.MeasurepH(Convert.ToSingle(Tempertur.TemperturValue)), 1);
+                            Ph.PH = Math.Round(uFire_pH.MeasurepH(Convert.ToSingle(Tempertur.TemperturValue)), 1);
+                        }
 
                         string tempterturText = Math.Round(Tempertur.TemperturValue, 1, MidpointRounding.AwayFromZero).ToString() + (char)SetCharacters.TemperatureCharactersNumber;
 
@@ -93,17 +97,23 @@ namespace AquariumController
 
                         Animation.ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
 
-                        Heater.SetHeaterControlOnOff(conn, Tempertur.TemperturValue, console);
+                        Heater.SetHeaterControlOnOff(conn, Tempertur.TemperturValue);
                         heater.HeaterOnOff(conn);
 
-                        AirPump.SetAirPumpFeedingOff(conn);
-                        AirPump.AirPumpOnOff(conn,_Controller, AIRPUMPPIN);
+                        //Blink display if tempertur is over max tempertur
+                        if (Tempertur.TemperturValue > Tempertur.TemperatureMax)
+                        {
+                            console.BlinkDisplay(1);
+                        }
+
+
+                        AirPump.AirPumpOnOff(conn, _Controller, AIRPUMPPIN);
 
                     }
 #pragma warning disable CA1031 // Do not catch general exception types
                     catch (Exception ex)
                     {
-                        ConsoleEx.WriteLineWithDate("Got an error: " + ex.Message +"StackTrace: "+ex.StackTrace);
+                        ConsoleEx.WriteLineWithDate("Got an error: " + ex.Message + "StackTrace: " + ex.StackTrace);
                         if (ex.InnerException != null)
                         {
                             ConsoleEx.WriteLineWithDate("Error InnerException: " + ex.InnerException.Message);
@@ -115,10 +125,11 @@ namespace AquariumController
                         Thread.Sleep(1000);
                     }
 #pragma warning restore CA1031 // Do not catch general exception types
-                 
+
                 }
 
                 console.Dispose();
+
             }
 
             saveTemperturTimer.Dispose();

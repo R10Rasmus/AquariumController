@@ -60,7 +60,7 @@ namespace AquariumController.Helper
 
         }
 
-        public static void SetHeaterControlOnOff(MySqlConnection conn, double _temperature, LcdConsole console)
+        public static void SetHeaterControlOnOff(MySqlConnection conn, double _temperature)
         {
             //if the system has an heater and a temperature
             //and if it is more then 5 min since it last was turned on/off, sow we do not now turn on off if the temperature is around max/min
@@ -70,8 +70,6 @@ namespace AquariumController.Helper
                 if (_temperature > Tempertur.TemperatureMax)
                 {
                     DB.Helper.SaveSettingValue(conn, "HeaterOnOff", false.ToString());
-
-                    console.BlinkDisplay(2);
 
                     _lastturnOnOff = DateTime.Now;
                 }

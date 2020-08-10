@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace AquariumController.Extension
 {
@@ -6,7 +7,7 @@ namespace AquariumController.Extension
     {
         public static void WriteLineWithDate(string value)
         {
-            Console.WriteLine(DateTime.Now + " " + value);
+            Console.WriteLine(DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("da-dk")) + " " + value);
         }
     }
 }
