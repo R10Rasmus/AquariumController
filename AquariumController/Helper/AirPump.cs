@@ -48,9 +48,17 @@ namespace AquariumController.Helper
 
                 if (DateTime.Now < _AirPumpStart)
                 {
-                    _TimerOff = new Timer(Math.Abs((DateTime.Now - _AirPumpStart).TotalMilliseconds));
-                    _TimerOff.Elapsed += TimerOn_Elapsed;
-                    _TimerOff.Start();
+                    if (_TimerOn == null)
+                    {
+                        _TimerOn = new Timer();
+                        _TimerOn.Elapsed += TimerOn_Elapsed;
+
+                    }
+
+                    _TimerOn.Interval = Math.Abs((DateTime.Now - _AirPumpStart).TotalMilliseconds);
+                    _TimerOn.Start();
+
+
                 }
                 
 
@@ -74,9 +82,17 @@ namespace AquariumController.Helper
 
                 if (DateTime.Now < _AirPumpStop)
                 {
-                    _TimerOff = new Timer(Math.Abs((DateTime.Now - _AirPumpStop).TotalMilliseconds));
-                    _TimerOff.Elapsed += TimerOff_Elapsed;
+                    if (_TimerOff == null)
+                    {
+                        _TimerOff = new Timer();
+                        _TimerOff.Elapsed += TimerOff_Elapsed;
+
+                    }
+
+                    _TimerOff.Interval = Math.Abs((DateTime.Now - _AirPumpStop).TotalMilliseconds);
                     _TimerOff.Start();
+
+
                 }
 
                 ConsoleEx.WriteLineWithDate($"AirPumpStop is {_AirPumpStop.ToString(CultureInfo.CreateSpecificCulture("da-dk"))}");
@@ -125,7 +141,7 @@ namespace AquariumController.Helper
 
                 double countDown = (DateTime.Now - feedingDateTime).TotalMilliseconds;
 
-                if (feedingCountDown==0 || feedingCountDown < countDown)
+                if (feedingCountDown == 0 || feedingCountDown < countDown)
                 {
                     feedingCountDown = countDown;
 
@@ -136,9 +152,16 @@ namespace AquariumController.Helper
             //feeding starter 1 min before set time
             feedingCountDown += 60000;
 
-            _FeedingOff = new Timer(Math.Abs(feedingCountDown));
-            _FeedingOff.Elapsed += FeedingOff_Elapsed;
+            if (_FeedingOff == null)
+            {
+                _FeedingOff = new Timer();
+                _FeedingOff.Elapsed += FeedingOff_Elapsed;
+            }
+
+            _FeedingOff.Interval = Math.Abs(feedingCountDown);
             _FeedingOff.Start();
+
+
 
         }
 
@@ -184,8 +207,13 @@ namespace AquariumController.Helper
             SetAirPumpOnOff(false);
 
             //stop feeding after 4 min.
-            _FeedingOn = new Timer(4 * 60 * 1000);
-            _FeedingOn.Elapsed += FeedingOn_Elapsed;
+            if(_FeedingOn==null)
+            {
+                _FeedingOn = new Timer();
+                _FeedingOn.Elapsed += FeedingOn_Elapsed;
+            }
+
+             _FeedingOn.Interval = 4 * 60 * 1000;
             _FeedingOn.Start();
 
             ConsoleEx.WriteLineWithDate($"Feeding mode is on. It stops in {_FeedingOn.Interval/1000} sec");
