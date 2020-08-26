@@ -100,7 +100,7 @@ namespace InfoPages.Controllers
         public ActionResult PH()
         {
 
-            return View();
+            return View(new Graph() { TimeSpan = EnumTimeSpan.OneMonth });
         }
 
         public ActionResult TemperatureData(EnumTimeSpan? timeSpan)
@@ -171,7 +171,7 @@ namespace InfoPages.Controllers
             rdr.Close();
             conn.Close();
 
-            return new Graph() { Max = _temperatureMax, Min = _temperatureMin };
+            return new Graph() { Max = _temperatureMax, Min = _temperatureMin, TimeSpan= EnumTimeSpan.OneMonth };
         }
 
         private static string GetWhereFromTimeSpan(EnumTimeSpan? timeSpan)

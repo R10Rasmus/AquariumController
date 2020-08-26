@@ -5,5 +5,7 @@ namespace InfoPages.Models
     {
         public int Max { get; set; }
         public int Min { get; set; }
+
+        public EnumTimeSpan TimeSpan { get; set; }
     }
 }

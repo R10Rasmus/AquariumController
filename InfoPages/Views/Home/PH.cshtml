@@ -1,4 +1,5 @@
 ﻿@using InfoPages.Models
+@model Graph
 
 @{
     ViewBag.Title = "pH";
@@ -11,11 +12,12 @@
 
     <script>
 
+        var dps = [];
+        var chart
 
         window.onload = function () {
-            var dps = [];
 
-            var chart = new CanvasJS.Chart("chartContainer", {
+            chart = new CanvasJS.Chart("chartContainer", {
                 theme: "light2", // "light1", "light2", "dark1", "dark2"
                 animationEnabled: true,
                 zoomEnabled: true,
@@ -46,24 +48,33 @@
 
                 }]
             });
+            $.getJSON("/home/PHData?timeSpan=@((int) Model.TimeSpan)", addData);
 
-            $.getJSON("/home/PHData", addData);
 
+        }
 
-            function addData(data) {
-                for (var i = 0; i < data.length; i++) {
-                    dps.push({
-                        x: new Date(data[i].X),
-                        y: data[i].Y
-                    });
-                }
-                chart.render();
+        function addData(data) {
+            dps.length = 0;
+            for (var i = 0; i < data.length; i++) {
+                dps.push({
+                    x: new Date(data[i].X),
+                    y: data[i].Y
+                });
             }
+            chart.render();
+        }
+
+        function callChangefunc(val) {
+            $.getJSON("/home/PHData?timeSpan=" + val, addData);
         }
 
     </script>
 </head>
 <body>
+    <br />
+    @Html.DropDownListFor(m => m.TimeSpan,
+         new SelectList(Enum.GetValues(typeof(EnumTimeSpan))), new { @onchange = "callChangefunc(this.value)" })
+
     <div id="chartContainer" style="height: 370px; width: 100%;"></div>
 
 </body>
