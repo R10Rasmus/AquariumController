@@ -10,7 +10,6 @@ C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Lcd1602Cont
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Microsoft.Win32.Registry.dll
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\MySql.Data.dll
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Newtonsoft.Json.dll
-C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\OneWire.dll
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Q42.HueApi.dll
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Renci.SshNet.dll
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\System.Buffers.dll
@@ -31,8 +30,6 @@ C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\UnitsNet.dl
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Zstandard.Net.dll
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Lcd1602Controller.pdb
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Lcd1602Controller.dll.config
-C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\OneWire.pdb
-C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\OneWire.dll.config
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\uFire_ISE.pdb
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Google.Protobuf.pdb
 C:\Projekter\PI\c#\AquariumController\AquariumController\bin\Release\Google.Protobuf.xml

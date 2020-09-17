@@ -39,6 +39,7 @@ namespace AquariumController
 
             ConsoleEx.WriteLineWithDate("Setting up UFire EC Probe...");
             Iot.Device.UFire.UFire_pH uFire_pH = new Iot.Device.UFire.UFire_pH(device);
+            uFire_pH.UseTemperatureCompensation(true);
 
             ConsoleEx.WriteLineWithDate("Setting up MySql db....");
             MySqlConnection conn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
@@ -80,14 +81,10 @@ namespace AquariumController
                 {
                     try
                     {
-                        Tempertur.TemperturValue = Tempertur.GetTempertur(DB.Helper.GetSettingFromDb(conn, "WaterTemperatureId"));
+                        
+                       Tempertur.TemperturValue = Convert.ToDouble( uFire_pH.MeasureTemp())+ Tempertur.TemperturCalibrateOffSet;
 
-                        if (Tempertur.TemperturValue > 0)
-                        {
-                            uFire_pH.SetTemp(Convert.ToSingle(Tempertur.TemperturValue));
-
-                            Ph.PH = Math.Round(uFire_pH.MeasurepH(Convert.ToSingle(Tempertur.TemperturValue)), 1);
-                        }
+                        Ph.PH = Math.Round(uFire_pH.MeasurepH(), 1);
 
                         string tempterturText = Math.Round(Tempertur.TemperturValue, 1, MidpointRounding.AwayFromZero).ToString() + (char)SetCharacters.TemperatureCharactersNumber;
 

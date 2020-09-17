@@ -1,5 +1,4 @@
 ﻿using AquariumController.Extension;
-using Iot.Device.OneWire;
 using MySql.Data.MySqlClient;
 using System;
 using System.Configuration;
@@ -8,7 +7,7 @@ namespace AquariumController.Helper
 {
     public static class Tempertur
     {
-        const double _TemperturCalibrateOffSet = 0.6;
+        public const double TemperturCalibrateOffSet = 0.6;
 
         public static double TemperturValue = 0;
         public static double TemperatureMin = 0;
@@ -32,20 +31,6 @@ namespace AquariumController.Helper
                 ConsoleEx.WriteLineWithDate($"Do not save tempertur if it is 0");
             }
 
-        }
-
-        public static double GetTempertur(string TemperatureId)
-        {
-            // Quick and simple way to find a thermometer and print the temperature
-            foreach (var dev in OneWireThermometerDevice.EnumerateDevices())
-            {
-                if (dev.DeviceId == TemperatureId)
-                {
-                    return dev.ReadTemperature().DegreesCelsius + _TemperturCalibrateOffSet;
-                }
-            }
-
-            return 0;
         }
 
         public static void SetupMaxMinTemperature(MySqlConnection conn)
