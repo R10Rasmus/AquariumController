@@ -7,7 +7,7 @@ namespace AquariumController.Helper
 {
     public static class Tempertur
     {
-        public const double TemperturCalibrateOffSet = 0.6;
+        public const double TemperturCalibrateOffSet = 0.9;
 
         public static double TemperturValue = 0;
         public static double TemperatureMin = 0;
