@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-
-
-namespace InfoPages.Models
+﻿namespace InfoPages.Models
 {
     public class Setting
     {

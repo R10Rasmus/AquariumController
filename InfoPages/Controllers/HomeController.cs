@@ -5,9 +5,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Web;
 using System.Web.Mvc;
 
 namespace InfoPages.Controllers
@@ -35,7 +32,7 @@ namespace InfoPages.Controllers
                 Connection = conn
             };
 
-            var rdr = cmd.ExecuteReader();
+            MySqlDataReader rdr = cmd.ExecuteReader();
 
             while (rdr.Read())
             {
@@ -58,7 +55,7 @@ namespace InfoPages.Controllers
                 Connection = conn
             };
 
-            var rdr = cmd.ExecuteReader();
+            MySqlDataReader rdr = cmd.ExecuteReader();
             rdr.Read();
 
             Setting setting = new Setting { Id = int.Parse(rdr["id"].ToString()), Name = rdr["title"].ToString(), Value = rdr["value"].ToString() };
@@ -86,7 +83,7 @@ namespace InfoPages.Controllers
                 Connection = conn
             };
 
-            var rdr = cmd.ExecuteNonQuery();
+            int rdr = cmd.ExecuteNonQuery();
 
             return RedirectToAction("Settings");
         }
@@ -123,13 +120,13 @@ namespace InfoPages.Controllers
 
         public ActionResult CPUTemperature()
         {
-            double temperature=0;
+            double temperature = 0;
             if (cpuTemperature.IsAvailable)
             {
                 temperature = cpuTemperature.Temperature.DegreesCelsius;
             }
             JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
-            return Content(JsonConvert.SerializeObject(Math.Round(temperature,1), _jsonSetting), "application/json");
+            return Content(JsonConvert.SerializeObject(Math.Round(temperature, 1), _jsonSetting), "application/json");
         }
 
         private static MySqlConnection OpenConnection()
@@ -151,7 +148,7 @@ namespace InfoPages.Controllers
                 CommandText = "SELECT value FROM settings where title = 'TemperatureMax'",
                 Connection = conn
             };
-            var rdr = cmd.ExecuteReader();
+            MySqlDataReader rdr = cmd.ExecuteReader();
 
             rdr.Read();
             _temperatureMax = int.Parse(rdr["value"].ToString());
@@ -171,7 +168,7 @@ namespace InfoPages.Controllers
             rdr.Close();
             conn.Close();
 
-            return new Graph() { Max = _temperatureMax, Min = _temperatureMin, TimeSpan= EnumTimeSpan.OneMonth };
+            return new Graph() { Max = _temperatureMax, Min = _temperatureMin, TimeSpan = EnumTimeSpan.OneMonth };
         }
 
         private static string GetWhereFromTimeSpan(EnumTimeSpan? timeSpan)
@@ -217,7 +214,7 @@ namespace InfoPages.Controllers
                 Connection = conn
             };
 
-            var rdr = cmd.ExecuteReader();
+            MySqlDataReader rdr = cmd.ExecuteReader();
 
             while (rdr.Read())
             {

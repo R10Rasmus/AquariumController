@@ -3,8 +3,6 @@ using AquariumController.Extension;
 using AquariumController.Helper;
 using Lcd1602Controller;
 using MySql.Data.MySqlClient;
-using Q42.HueApi;
-using Q42.HueApi.Interfaces;
 using System;
 using System.Configuration;
 using System.Device.Gpio;
@@ -52,7 +50,7 @@ namespace AquariumController
             Timer savePhTimer = Settings.SetupSaveInterval(conn, "PHSaveInterval", Ph.SavePh);
 
             //read setting every 5 minute.
-            AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);          
+            AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);
             Timer readSetupTimer = new Timer(Settings.ReadSetup, saveTemperturAutoResetEvent, 0, 5 * 60 * 1000);
 
             ConsoleEx.WriteLineWithDate("Setting up GpioController....");
@@ -81,8 +79,8 @@ namespace AquariumController
                 {
                     try
                     {
-                        
-                       Tempertur.TemperturValue = Convert.ToDouble( uFire_pH.MeasureTemp())+ Tempertur.TemperturCalibrateOffSet;
+
+                        Tempertur.TemperturValue = Convert.ToDouble(uFire_pH.MeasureTemp()) + Tempertur.TemperturCalibrateOffSet;
 
                         Ph.PH = Math.Round(uFire_pH.MeasurepH(), 1);
 

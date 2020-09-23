@@ -1,11 +1,9 @@
 ﻿using AquariumController.Extension;
 using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Device.Gpio;
 using System.Globalization;
-using System.Linq;
 using System.Timers;
 
 namespace AquariumController.Helper
@@ -60,7 +58,7 @@ namespace AquariumController.Helper
 
 
                 }
-                
+
 
                 ConsoleEx.WriteLineWithDate($"AirPumpStart is {_AirPumpStart.ToString(CultureInfo.CreateSpecificCulture("da-dk"))}");
             }
@@ -98,10 +96,10 @@ namespace AquariumController.Helper
                 ConsoleEx.WriteLineWithDate($"AirPumpStop is {_AirPumpStop.ToString(CultureInfo.CreateSpecificCulture("da-dk"))}");
             }
 
-            if(SetupAirPumpStartStopTimeFirstRun)
+            if (SetupAirPumpStartStopTimeFirstRun)
             {
-              
-                if(DateTime.Now.TimeOfDay> _AirPumpStop.TimeOfDay)
+
+                if (DateTime.Now.TimeOfDay > _AirPumpStop.TimeOfDay)
                 {
                     _TimerAirPumpOn = false;
                     DB.Helper.SaveSettingValue(conn, "airPumpOnOff", false.ToString());
@@ -166,7 +164,7 @@ namespace AquariumController.Helper
         }
 
 
-        public static void AirPumpOnOff(MySqlConnection conn, GpioController gpioController, int airPumpPin )
+        public static void AirPumpOnOff(MySqlConnection conn, GpioController gpioController, int airPumpPin)
         {
 
             if (bool.TryParse(DB.Helper.GetSettingFromDb(conn, "AirPumpOnOff"), out bool result))
@@ -207,16 +205,16 @@ namespace AquariumController.Helper
             SetAirPumpOnOff(false);
 
             //stop feeding after 4 min.
-            if(_FeedingOn==null)
+            if (_FeedingOn == null)
             {
                 _FeedingOn = new Timer();
                 _FeedingOn.Elapsed += FeedingOn_Elapsed;
             }
 
-             _FeedingOn.Interval = 4 * 60 * 1000;
+            _FeedingOn.Interval = 4 * 60 * 1000;
             _FeedingOn.Start();
 
-            ConsoleEx.WriteLineWithDate($"Feeding mode is on. It stops in {_FeedingOn.Interval/1000} sec");
+            ConsoleEx.WriteLineWithDate($"Feeding mode is on. It stops in {_FeedingOn.Interval / 1000} sec");
         }
 
         private static void TimerOn_Elapsed(object sender, ElapsedEventArgs e)
@@ -236,7 +234,7 @@ namespace AquariumController.Helper
 
         private static void SetAirPumpOnOff(bool value)
         {
-            var localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
+            MySqlConnection localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
             localConn.Open();
 
             _TimerAirPumpOn = value;

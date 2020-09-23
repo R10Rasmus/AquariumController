@@ -25,7 +25,7 @@ namespace AquariumController.Helper
             {
                 ConsoleEx.WriteLineWithDate($"Save ph with value {PH}");
 
-                var localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
+                MySqlConnection localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
                 localConn.Open();
 
                 DB.Helper.SaveChannelValue(localConn, "ph", PH);

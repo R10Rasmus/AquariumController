@@ -24,7 +24,7 @@ namespace AquariumController.Helper
         public static void ReadSetup(Object stateInfo)
         {
             ConsoleEx.WriteLineWithDate("Read settings...");
-            var localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
+            MySqlConnection localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
             localConn.Open();
 
             Tempertur.SetupMaxMinTemperature(localConn);

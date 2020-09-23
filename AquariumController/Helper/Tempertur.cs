@@ -18,7 +18,7 @@ namespace AquariumController.Helper
             {
                 ConsoleEx.WriteLineWithDate($"Save tempertur with value {TemperturValue}");
 
-                var localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
+                MySqlConnection localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
                 localConn.Open();
 
                 DB.Helper.SaveChannelValue(localConn, "temperature", TemperturValue);

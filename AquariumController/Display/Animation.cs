@@ -1,5 +1,4 @@
 ﻿using Lcd1602Controller;
-using System.Threading;
 
 namespace AquariumController.Display
 {

@@ -1,5 +1,4 @@
 ﻿using MySql.Data.MySqlClient;
-using System;
 
 namespace AquariumController.DB
 {
@@ -14,7 +13,7 @@ namespace AquariumController.DB
                 Connection = conn
             };
 
-            var rdr = cmd.ExecuteReader();
+            MySqlDataReader rdr = cmd.ExecuteReader();
             rdr.Read();
 
             string value = rdr["value"].ToString();
@@ -33,7 +32,7 @@ namespace AquariumController.DB
                 Connection = conn
             };
 
-            var rdr = cmd.ExecuteNonQuery();
+            int rdr = cmd.ExecuteNonQuery();
 
 
 
@@ -44,11 +43,11 @@ namespace AquariumController.DB
 
             MySqlCommand cmd = new MySqlCommand
             {
-                CommandText = "update settings set value ='" + value+ "' where title ='" + settingName +"';",
+                CommandText = "update settings set value ='" + value + "' where title ='" + settingName + "';",
                 Connection = conn
             };
 
-            var rdr = cmd.ExecuteNonQuery();
+            int rdr = cmd.ExecuteNonQuery();
         }
 
     }

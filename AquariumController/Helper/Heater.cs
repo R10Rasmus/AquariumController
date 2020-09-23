@@ -1,5 +1,4 @@
 ﻿using AquariumController.Extension;
-using Lcd1602Controller;
 using MySql.Data.MySqlClient;
 using Q42.HueApi;
 using Q42.HueApi.Interfaces;
@@ -90,7 +89,7 @@ namespace AquariumController.Helper
             LightCommand lightCommand = new LightCommand() { On = on };
             client.SendCommandAsync(lightCommand, new List<string> { aquariumHeater.Id });
 
-            ConsoleEx.WriteLineWithDate($"Heater {(on?"on":"off")}!");
+            ConsoleEx.WriteLineWithDate($"Heater {(on ? "on" : "off")}!");
         }
     }
 }
