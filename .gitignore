@@ -2,12 +2,13 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs/AquariumController/v16
 /.vs
-/AquariumController/bin/Debug
-/AquariumController/obj/Debug
-/Lcd1602Controller/bin/Debug
-/Lcd1602Controller/obj/Debug
+/AquariumController/bin
+/AquariumController/obj
+/Lcd1602Controller/bin
+/Lcd1602Controller/obj
 /packages
 /InfoPages/bin
-/InfoPages/obj/Release
+/InfoPages/obj
+/uFire_ISE/obj
+/uFire_ISE/bin
