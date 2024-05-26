@@ -27,7 +27,7 @@ namespace AquariumController
 
         static void Main(string[] args)
         {
-            Heater heater = null;
+            Cooler heater = null;
 
             ConsoleEx.WriteLineWithDate("AquariumController is running");
 
@@ -44,7 +44,7 @@ namespace AquariumController
             conn.Open();
 
             ConsoleEx.WriteLineWithDate("Setting up Heater....");
-            heater = new Heater(conn);
+            heater = new Cooler(conn);
 
             Timer saveTemperturTimer = Settings.SetupSaveInterval(conn, "TemperatureSaveInterval", Tempertur.SaveTempertur);
             Timer savePhTimer = Settings.SetupSaveInterval(conn, "PHSaveInterval", Ph.SavePh);
@@ -92,8 +92,8 @@ namespace AquariumController
 
                         Animation.ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
 
-                        Heater.SetHeaterControlOnOff(conn, Tempertur.TemperturValue);
-                        heater.HeaterOnOff(conn);
+                        Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);
+                        heater.CoolerOnOff(conn);
 
                         //Blink display if tempertur is over max tempertur
                         if (Tempertur.TemperturValue > Tempertur.TemperatureMax)
@@ -102,7 +102,7 @@ namespace AquariumController
                         }
 
 
-                        AirPump.AirPumpOnOff(conn, _Controller, AIRPUMPPIN);
+                        //AirPump.AirPumpOnOff(conn, _Controller, AIRPUMPPIN);
 
                     }
 #pragma warning disable CA1031 // Do not catch general exception types

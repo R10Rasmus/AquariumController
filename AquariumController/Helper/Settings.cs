@@ -29,8 +29,8 @@ namespace AquariumController.Helper
 
             Tempertur.SetupMaxMinTemperature(localConn);
 
-            AirPump.SetupAirPumpStartStopTime(localConn);
-            AirPump.SetupAirPumpFeedingStop(localConn);
+            //AirPump.SetupAirPumpStartStopTime(localConn);
+           // AirPump.SetupAirPumpFeedingStop(localConn);
 
 
             localConn.Close();

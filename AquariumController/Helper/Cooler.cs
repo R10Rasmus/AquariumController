@@ -8,15 +8,15 @@ using System.Linq;
 
 namespace AquariumController.Helper
 {
-    public class Heater
+    public class Cooler
     {
         private static DateTime _lastturnOnOff = new DateTime();
-        private bool _HeaterOnOff = false;
+        private bool _CoolerOnOff = false;
 
         private readonly ILocalHueClient client;
-        private readonly Light aquariumHeater;
+        private readonly Light aquariumFanCooler;
 
-        public Heater(MySqlConnection conn)
+        public Cooler(MySqlConnection conn)
         {
             ConsoleEx.WriteLineWithDate($"Getting PhilipsHue Lights...");
 
@@ -30,28 +30,28 @@ namespace AquariumController.Helper
                 ConsoleEx.WriteLineWithDate("name:" + item.Name + " id:" + item.Id);
             }
 
-            aquariumHeater = lights.FirstOrDefault(t => t.Name == DB.Helper.GetSettingFromDb(conn, "HeaterName"));
+            aquariumFanCooler = lights.FirstOrDefault(t => t.Name == DB.Helper.GetSettingFromDb(conn, "HeaterName"));
 
-            //make sure heater is turned off at startup
-            TurnHeaterOnOff(false);
+            //make sure cooler is turned off at startup
+            TurnCoolerOnOff(false);
         }
 
-        public void HeaterOnOff(MySqlConnection conn)
+        public void CoolerOnOff(MySqlConnection conn)
         {
 
-            if (bool.TryParse(DB.Helper.GetSettingFromDb(conn, "HeaterOnOff"), out bool result) && aquariumHeater != null)
+            if (bool.TryParse(DB.Helper.GetSettingFromDb(conn, "HeaterOnOff"), out bool result) && aquariumFanCooler != null)
             {
-                if (_HeaterOnOff != result)
+                if (_CoolerOnOff != result)
                 {
-                    _HeaterOnOff = result;
+                    _CoolerOnOff = result;
 
                     if (result)
                     {
-                        TurnHeaterOnOff(true);
+                        TurnCoolerOnOff(true);
                     }
                     else
                     {
-                        TurnHeaterOnOff(false);
+                        TurnCoolerOnOff(false);
                     }
                 }
 
@@ -59,37 +59,37 @@ namespace AquariumController.Helper
 
         }
 
-        public static void SetHeaterControlOnOff(MySqlConnection conn, double _temperature)
+        public static void SetCoolerControlOnOff(MySqlConnection conn, double _temperature)
         {
-            //if the system has an heater and a temperature
+            //if the system has cooler and a temperature
             //and if it is more then 5 min since it last was turned on/off, sow we do not now turn on off if the temperature is around max/min
             if (_temperature > 0 && _lastturnOnOff.AddMinutes(5) < DateTime.Now)
             {
-                //if temperature is over max, then turn off heater
+                //if temperature is over max, then turn on cooler
                 if (_temperature > Tempertur.TemperatureMax)
-                {
-                    DB.Helper.SaveSettingValue(conn, "HeaterOnOff", false.ToString());
-
-                    _lastturnOnOff = DateTime.Now;
-                }
-
-                //if temperature is under min, then turn on heater
-                if (_temperature < Tempertur.TemperatureMin)
                 {
                     DB.Helper.SaveSettingValue(conn, "HeaterOnOff", true.ToString());
 
                     _lastturnOnOff = DateTime.Now;
+                }
+
+                //if temperature is under TemperatureMax, then turn off cooler
+                if (_temperature < Tempertur.TemperatureMax)
+                {
+                    DB.Helper.SaveSettingValue(conn, "HeaterOnOff", false.ToString());
+
+                    _lastturnOnOff = DateTime.Now;
 
                 }
             }
         }
 
-        private void TurnHeaterOnOff(bool on)
+        private void TurnCoolerOnOff(bool on)
         {
             LightCommand lightCommand = new LightCommand() { On = on };
-            client.SendCommandAsync(lightCommand, new List<string> { aquariumHeater.Id });
+            client.SendCommandAsync(lightCommand, new List<string> { aquariumFanCooler.Id });
 
-            ConsoleEx.WriteLineWithDate($"Heater {(on ? "on" : "off")}!");
+            ConsoleEx.WriteLineWithDate($"Cooler {(on ? "on" : "off")}!");
         }
     }
 }
