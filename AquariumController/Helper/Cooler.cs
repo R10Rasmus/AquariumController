@@ -11,10 +11,12 @@ namespace AquariumController.Helper
     public class Cooler
     {
         private static DateTime _lastturnOnOff = new DateTime();
-        private bool _CoolerOnOff = false;
+        private bool _FanCoolerOnOff = false;
+        private bool _ExtraCoolerOnOff = false;
 
         private readonly ILocalHueClient client;
         private readonly Light aquariumFanCooler;
+        private readonly Light aquariumExtraCooler;
 
         public Cooler(MySqlConnection conn)
         {
@@ -30,29 +32,32 @@ namespace AquariumController.Helper
                 ConsoleEx.WriteLineWithDate("name:" + item.Name + " id:" + item.Id);
             }
 
-            aquariumFanCooler = lights.FirstOrDefault(t => t.Name == DB.Helper.GetSettingFromDb(conn, "HeaterName"));
+            aquariumFanCooler = lights.FirstOrDefault(t => t.Name == DB.Helper.GetSettingFromDb(conn, "FanCoolerName"));
+            aquariumExtraCooler = lights.FirstOrDefault(t => t.Name == DB.Helper.GetSettingFromDb(conn, "ExtraCoolerName"));
 
             //make sure cooler is turned off at startup
-            TurnCoolerOnOff(false);
+            TurnExtraCoolerOnOff(false);
+            TurnFanCoolerOnOff(false);
         }
 
         public void CoolerOnOff(MySqlConnection conn)
         {
 
-            if (bool.TryParse(DB.Helper.GetSettingFromDb(conn, "HeaterOnOff"), out bool result) && aquariumFanCooler != null)
+            if (bool.TryParse(DB.Helper.GetSettingFromDb(conn, "FanCoolerrOnOff"), out bool fanResult) && aquariumFanCooler != null)
             {
-                if (_CoolerOnOff != result)
+                if (_FanCoolerOnOff != fanResult)
                 {
-                    _CoolerOnOff = result;
+                    _FanCoolerOnOff = fanResult;
+                    TurnFanCoolerOnOff(fanResult);
+                }
+            }
 
-                    if (result)
-                    {
-                        TurnCoolerOnOff(true);
-                    }
-                    else
-                    {
-                        TurnCoolerOnOff(false);
-                    }
+            if (bool.TryParse(DB.Helper.GetSettingFromDb(conn, "ExtraCoolerOnOff"), out bool extraResult) && aquariumFanCooler != null)
+            {
+                if (_ExtraCoolerOnOff != extraResult)
+                {
+                    _ExtraCoolerOnOff = extraResult;
+                    TurnExtraCoolerOnOff(extraResult);
                 }
 
             }
@@ -68,15 +73,31 @@ namespace AquariumController.Helper
                 //if temperature is over max, then turn on cooler
                 if (_temperature > Tempertur.TemperatureMax)
                 {
-                    DB.Helper.SaveSettingValue(conn, "HeaterOnOff", true.ToString());
+                    DB.Helper.SaveSettingValue(conn, "FanCoolerrOnOff", true.ToString());
 
                     _lastturnOnOff = DateTime.Now;
+                }
+
+                
+                if (_temperature > Tempertur.TemperatureMax+0.2)
+                {
+                    DB.Helper.SaveSettingValue(conn, "ExtraCoolerOnOff", true.ToString());
+
+                    _lastturnOnOff = DateTime.Now;
+                }
+
+                if (_temperature < Tempertur.TemperatureMax+0.1)
+                {
+                    DB.Helper.SaveSettingValue(conn, "ExtraCoolerOnOff", false.ToString());
+
+                    _lastturnOnOff = DateTime.Now;
+
                 }
 
                 //if temperature is under TemperatureMax, then turn off cooler
                 if (_temperature < Tempertur.TemperatureMax)
                 {
-                    DB.Helper.SaveSettingValue(conn, "HeaterOnOff", false.ToString());
+                    DB.Helper.SaveSettingValue(conn, "FanCoolerrOnOff", false.ToString());
 
                     _lastturnOnOff = DateTime.Now;
 
@@ -84,12 +105,25 @@ namespace AquariumController.Helper
             }
         }
 
-        private void TurnCoolerOnOff(bool on)
+        private void TurnFanCoolerOnOff(bool on)
         {
             LightCommand lightCommand = new LightCommand() { On = on };
             client.SendCommandAsync(lightCommand, new List<string> { aquariumFanCooler.Id });
 
-            ConsoleEx.WriteLineWithDate($"Cooler {(on ? "on" : "off")}!");
+            ConsoleEx.WriteLineWithDate($"Fan Cooler {(on ? "on" : "off")}!");
+        }
+
+        private void TurnExtraCoolerOnOff(bool on)
+        {
+            if (aquariumExtraCooler != null)
+            {
+                LightCommand lightCommand = new LightCommand() { On = on };
+                client.SendCommandAsync(lightCommand, new List<string> { aquariumExtraCooler.Id });
+
+                ConsoleEx.WriteLineWithDate($"Extra Cooler {(on ? "on" : "off")}!");
+            }
+
+           
         }
     }
 }

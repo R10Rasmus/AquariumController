@@ -27,7 +27,7 @@ namespace AquariumController
 
         static void Main(string[] args)
         {
-            Cooler heater = null;
+            Cooler cooler = null;
 
             ConsoleEx.WriteLineWithDate("AquariumController is running");
 
@@ -44,7 +44,7 @@ namespace AquariumController
             conn.Open();
 
             ConsoleEx.WriteLineWithDate("Setting up Heater....");
-            heater = new Cooler(conn);
+            cooler = new Cooler(conn);
 
             Timer saveTemperturTimer = Settings.SetupSaveInterval(conn, "TemperatureSaveInterval", Tempertur.SaveTempertur);
             Timer savePhTimer = Settings.SetupSaveInterval(conn, "PHSaveInterval", Ph.SavePh);
@@ -82,9 +82,14 @@ namespace AquariumController
 
                         Tempertur.TemperturValue = Convert.ToDouble(uFire_pH.MeasureTemp()) + Tempertur.TemperturCalibrateOffSet;
 
+                        Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);
+                        cooler.CoolerOnOff(conn);
+
                         Ph.PH = Math.Round(uFire_pH.MeasurepH(), 1);
 
-                        string tempterturText = Math.Round(Tempertur.TemperturValue, 1, MidpointRounding.AwayFromZero).ToString() + (char)SetCharacters.TemperatureCharactersNumber;
+                        var roundTemp = Math.Round(Tempertur.TemperturValue, 1, MidpointRounding.AwayFromZero);
+
+                        string tempterturText = roundTemp.ToString() + (char)SetCharacters.TemperatureCharactersNumber;
 
                         string pHText = Ph.PH + "pH";
 
@@ -92,15 +97,11 @@ namespace AquariumController
 
                         Animation.ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
 
-                        Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);
-                        heater.CoolerOnOff(conn);
-
                         //Blink display if tempertur is over max tempertur
-                        if (Tempertur.TemperturValue > Tempertur.TemperatureMax)
+                        if (roundTemp > Tempertur.TemperatureMax)
                         {
                             console.BlinkDisplay(1);
                         }
-
 
                         //AirPump.AirPumpOnOff(conn, _Controller, AIRPUMPPIN);
 
@@ -108,6 +109,7 @@ namespace AquariumController
 #pragma warning disable CA1031 // Do not catch general exception types
                     catch (Exception ex)
                     {
+                        console.ReplaceLine(0, "ERROR! Check tempertur and restart");
                         ConsoleEx.WriteLineWithDate("Got an error: " + ex.Message + "StackTrace: " + ex.StackTrace);
                         if (ex.InnerException != null)
                         {
