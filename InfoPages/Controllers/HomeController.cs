@@ -45,6 +45,8 @@ namespace InfoPages.Controllers
             return View(settings);
         }
 
+      
+
         public ActionResult EditSetting(int Id)
         {
             MySqlConnection conn = OpenConnection();
@@ -115,9 +117,6 @@ namespace InfoPages.Controllers
             return Content(JsonConvert.SerializeObject(GetData(timeSpan, "ph"), _jsonSetting), "application/json");
 
         }
-
-
-
         public ActionResult CPUTemperature()
         {
             double temperature = 0;
