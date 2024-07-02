@@ -34,7 +34,18 @@ namespace AquariumController.DB
 
             int rdr = cmd.ExecuteNonQuery();
 
+        }
 
+        public static void SaveFail(MySqlConnection conn, string message, string stackTrace)
+        {
+
+            MySqlCommand cmd = new MySqlCommand
+            {
+                CommandText = "INSERT INTO fails (message,stacktrace) VALUES('" + message + "','" + stackTrace + "' ); ",
+                Connection = conn
+            };
+
+            int rdr = cmd.ExecuteNonQuery();
 
         }
 

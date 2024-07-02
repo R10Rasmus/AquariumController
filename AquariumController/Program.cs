@@ -111,6 +111,7 @@ namespace AquariumController
                     {
                         console.ReplaceLine(0, "ERROR! Check tempertur and restart");
                         ConsoleEx.WriteLineWithDate("Got an error: " + ex.Message + "StackTrace: " + ex.StackTrace);
+                        Fails.SaveFail(ex);
                         if (ex.InnerException != null)
                         {
                             ConsoleEx.WriteLineWithDate("Error InnerException: " + ex.InnerException.Message);

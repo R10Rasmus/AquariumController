@@ -192,6 +192,7 @@
     <Compile Include="Extension\ConsoleEx.cs" />
     <Compile Include="Helper\AirPump.cs" />
     <Compile Include="Helper\Cooler.cs" />
+    <Compile Include="Helper\Fails.cs" />
     <Compile Include="Helper\Ph.cs" />
     <Compile Include="Helper\Settings.cs" />
     <Compile Include="Helper\Tempertur.cs" />
