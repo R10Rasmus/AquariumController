@@ -5,7 +5,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <_PublishTargetUrl>C:\Users\rasmu\source\repos\AquariumController\InfoPages\bin\app.publish\</_PublishTargetUrl>
-    <History>True|2024-07-01T18:51:26.9153980Z||;True|2024-07-01T19:21:45.5903513+02:00||;</History>
+    <History>True|2024-07-02T11:43:13.6022982Z||;True|2024-07-01T20:51:26.9153980+02:00||;True|2024-07-01T19:21:45.5903513+02:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
   <ItemGroup>
@@ -37,10 +37,10 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>06/03/2020 07:02:12</publishTime>
     </File>
     <File Include="bin/InfoPages.dll">
-      <publishTime>07/01/2024 21:26:15</publishTime>
+      <publishTime>07/02/2024 13:43:12</publishTime>
     </File>
     <File Include="bin/InfoPages.pdb">
-      <publishTime>07/01/2024 21:26:15</publishTime>
+      <publishTime>07/02/2024 13:43:12</publishTime>
     </File>
     <File Include="bin/K4os.Compression.LZ4.dll">
       <publishTime>03/17/2024 22:56:16</publishTime>
@@ -834,6 +834,9 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
     <File Include="Scripts/umd/popper.min.js.map">
       <publishTime>07/01/2024 14:04:54</publishTime>
     </File>
+    <File Include="Views/Fails/Index.cshtml">
+      <publishTime>07/02/2024 13:25:58</publishTime>
+    </File>
     <File Include="Views/Home/About.cshtml">
       <publishTime>07/01/2020 11:08:38</publishTime>
     </File>
@@ -859,7 +862,7 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
       <publishTime>05/19/2024 19:27:10</publishTime>
     </File>
     <File Include="Views/Shared/_Layout.cshtml">
-      <publishTime>07/01/2024 21:24:50</publishTime>
+      <publishTime>07/02/2024 13:41:30</publishTime>
     </File>
     <File Include="Views/Web.config">
       <publishTime>07/01/2024 18:43:01</publishTime>
