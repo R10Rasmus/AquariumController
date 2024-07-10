@@ -22,8 +22,8 @@ namespace AquariumController.Helper
         {
             ConsoleEx.WriteLineWithDate($"Getting PhilipsHue Lights...");
 
-            client = new LocalHueClient(DB.Helper.GetSettingFromDb(conn, "PhilipsHueIp"));
-            client.Initialize(DB.Helper.GetSettingFromDb(conn, "PhilipsHuePersonalAppKey"));
+            client = new LocalHueClient(Helpers.DB.Helper.GetSettingFromDb(conn, "PhilipsHueIp"));
+            client.Initialize(Helpers.DB.Helper.GetSettingFromDb(conn, "PhilipsHuePersonalAppKey"));
 
             IEnumerable<Light> lights = client.GetLightsAsync().GetAwaiter().GetResult();
 
@@ -32,8 +32,8 @@ namespace AquariumController.Helper
                 ConsoleEx.WriteLineWithDate("name:" + item.Name + " id:" + item.Id);
             }
 
-            aquariumFanCooler = lights.FirstOrDefault(t => t.Name == DB.Helper.GetSettingFromDb(conn, "FanCoolerName"));
-            aquariumExtraCooler = lights.FirstOrDefault(t => t.Name == DB.Helper.GetSettingFromDb(conn, "ExtraCoolerName"));
+            aquariumFanCooler = lights.FirstOrDefault(t => t.Name == Helpers.DB.Helper.GetSettingFromDb(conn, "FanCoolerName"));
+            aquariumExtraCooler = lights.FirstOrDefault(t => t.Name == Helpers.DB.Helper.GetSettingFromDb(conn, "ExtraCoolerName"));
 
             //make sure cooler is turned off at startup
             TurnExtraCoolerOnOff(false);
@@ -43,7 +43,7 @@ namespace AquariumController.Helper
         public void CoolerOnOff(MySqlConnection conn)
         {
 
-            if (bool.TryParse(DB.Helper.GetSettingFromDb(conn, "FanCoolerrOnOff"), out bool fanResult) && aquariumFanCooler != null)
+            if (bool.TryParse(Helpers.DB.Helper.GetSettingFromDb(conn, "FanCoolerrOnOff"), out bool fanResult) && aquariumFanCooler != null)
             {
                 if (_FanCoolerOnOff != fanResult)
                 {
@@ -52,7 +52,7 @@ namespace AquariumController.Helper
                 }
             }
 
-            if (bool.TryParse(DB.Helper.GetSettingFromDb(conn, "ExtraCoolerOnOff"), out bool extraResult) && aquariumFanCooler != null)
+            if (bool.TryParse(Helpers.DB.Helper.GetSettingFromDb(conn, "ExtraCoolerOnOff"), out bool extraResult) && aquariumFanCooler != null)
             {
                 if (_ExtraCoolerOnOff != extraResult)
                 {
@@ -73,7 +73,7 @@ namespace AquariumController.Helper
                 //if temperature is over max, then turn on cooler
                 if (_temperature > Tempertur.TemperatureMax)
                 {
-                    DB.Helper.SaveSettingValue(conn, "FanCoolerrOnOff", true.ToString());
+                    Helpers.DB.Helper.SaveSettingValue(conn, "FanCoolerrOnOff", true.ToString());
 
                     _lastturnOnOff = DateTime.Now;
                 }
@@ -81,14 +81,14 @@ namespace AquariumController.Helper
                 
                 if (_temperature > Tempertur.TemperatureMax+0.2)
                 {
-                    DB.Helper.SaveSettingValue(conn, "ExtraCoolerOnOff", true.ToString());
+                    Helpers.DB.Helper.SaveSettingValue(conn, "ExtraCoolerOnOff", true.ToString());
 
                     _lastturnOnOff = DateTime.Now;
                 }
 
                 if (_temperature < Tempertur.TemperatureMax+0.1)
                 {
-                    DB.Helper.SaveSettingValue(conn, "ExtraCoolerOnOff", false.ToString());
+                    Helpers.DB.Helper.SaveSettingValue(conn, "ExtraCoolerOnOff", false.ToString());
 
                     _lastturnOnOff = DateTime.Now;
 
@@ -97,7 +97,7 @@ namespace AquariumController.Helper
                 //if temperature is under TemperatureMax, then turn off cooler
                 if (_temperature < Tempertur.TemperatureMax)
                 {
-                    DB.Helper.SaveSettingValue(conn, "FanCoolerrOnOff", false.ToString());
+                    Helpers.DB.Helper.SaveSettingValue(conn, "FanCoolerrOnOff", false.ToString());
 
                     _lastturnOnOff = DateTime.Now;
 

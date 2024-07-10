@@ -72,8 +72,14 @@
     <div class="row">
         <div id="statusContainer" class="col-md-12" style="margin-top: 20px;">
             <h3>Status</h3>
-            <div id="fanStatus" class="status-indicator"></div>
-            <div id="coolerStatus" class="status-indicator"></div>
+            <div id="fanStatusContainer" class="status-indicator">
+                <div id="fanHueStatus" class="status-half"></div>
+                <div id="fanStatus" class="status-half"></div>
+            </div>
+            <div id="coolerStatusContainer" class="status-indicator">
+                <div id="coolerHueStatus" class="status-half"></div>
+                <div id="coolerStatus" class="status-half"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -81,11 +87,15 @@
 <script>
     $(document).ready(function () {
         $.getJSON("/status/GetStatus", function (data) {
-            var fanStatus = !data.FanCoolerOnOff ? "green" : "red";
-            var coolerStatus = !data.ExtraCoolerOnOff ? "green" : "red";
+            var fanStatusColor = !data.FanCoolerOnOff ? "green" : "red";
+            var fanHueStatusColor = data.FanCoolerOnOffHue ? "green" : "red";
+            var coolerStatusColor = !data.ExtraCoolerOnOff ? "green" : "red";
+            var coolerHueStatusColor = data.ExtraCoolerOnOffHue ? "green" : "red";
 
-            $("#fanStatus").css("background-color", fanStatus).text("Fan Status: " + (!data.FanCoolerOnOff ? "On" : "Off"));
-            $("#coolerStatus").css("background-color", coolerStatus).text("Cooler Status: " + (!data.ExtraCoolerOnOff ? "On" : "Off"));
+            $("#fanStatus").css("background-color", fanStatusColor).text("Fan Status: " + (!data.FanCoolerOnOff ? "On" : "Off"));
+            $("#fanHueStatus").css("background-color", fanHueStatusColor).text("Fan Hue: " + (data.FanCoolerOnOffHue ? "On" : "Off"));
+            $("#coolerStatus").css("background-color", coolerStatusColor).text("Cooler Status: " + (!data.ExtraCoolerOnOff ? "On" : "Off"));
+            $("#coolerHueStatus").css("background-color", coolerHueStatusColor).text("Cooler Hue: " + (data.ExtraCoolerOnOffHue ? "On" : "Off"));
         });
     });
 </script>
@@ -98,5 +108,21 @@
         color: white;
         text-align: center;
         font-size: 18px;
+        overflow: hidden;
+    }
+
+    .status-half {
+        width: 50%;
+        float: left;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    #fanStatusContainer {
+        clear: both;
+    }
+
+    #coolerStatusContainer {
+        clear: both;
     }
 </style>

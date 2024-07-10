@@ -4,11 +4,33 @@ using System.Web.Mvc;
 using MySql.Data.MySqlClient;
 using InfoPages.Models;
 using System.Configuration;
+using MySqlX.XDevAPI;
+using Q42.HueApi;
+using System.Collections.Generic;
+using Q42.HueApi.Interfaces;
+using System.Web.Razor.Tokenizer;
 
 namespace InfoPages.Controllers
 {
     public class StatusController : Controller
     {
+        private readonly ILocalHueClient client;
+        private readonly Light aquariumFanCooler;
+        private readonly Light aquariumExtraCooler;
+        public StatusController()
+        {
+            using (MySqlConnection conn = OpenConnection())
+            {
+                conn.Open();
+                client = new LocalHueClient(Helpers.DB.Helper.GetSettingFromDb(conn, "PhilipsHueIp"));
+                client.Initialize(Helpers.DB.Helper.GetSettingFromDb(conn, "PhilipsHuePersonalAppKey"));
+
+                IEnumerable<Light> lights = client.GetLightsAsync().GetAwaiter().GetResult();
+
+                aquariumFanCooler = lights.FirstOrDefault(t => t.Name == Helpers.DB.Helper.GetSettingFromDb(conn, "FanCoolerName"));
+                aquariumExtraCooler = lights.FirstOrDefault(t => t.Name == Helpers.DB.Helper.GetSettingFromDb(conn, "ExtraCoolerName"));
+            }
+        }
         private MySqlConnection OpenConnection()
         {
             string connectionString = ConfigurationManager.ConnectionStrings["mysql"].ConnectionString;
@@ -22,6 +44,9 @@ namespace InfoPages.Controllers
             using (MySqlConnection conn = OpenConnection())
             {
                 conn.Open();
+
+
+                IEnumerable<Light> lights = client.GetLightsAsync().GetAwaiter().GetResult();
 
                 string query = "SELECT title, value FROM settings WHERE title IN ('FanCoolerrOnOff', 'ExtraCoolerOnOff')"; // Replace 'statusTable' with your actual table name
 
@@ -41,6 +66,10 @@ namespace InfoPages.Controllers
                         }
                     }
                 }
+
+                status.FanCoolerOnOffHue = aquariumFanCooler.State.On;
+                if(aquariumExtraCooler != null)
+                    status.ExtraCoolerOnOffHue = aquariumExtraCooler.State.On;
             }
 
             return Json(status, JsonRequestBehavior.AllowGet);
@@ -50,6 +79,10 @@ namespace InfoPages.Controllers
     public class StatusModel
     {
         public string FanCoolerOnOff { get; set; }
+
+        public bool FanCoolerOnOffHue { get; set; }
         public string ExtraCoolerOnOff { get; set; }
+
+        public bool ExtraCoolerOnOffHue { get; set; }
     }
 }

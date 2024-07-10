@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30204.135
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquariumController", "AquariumController\AquariumController.csproj", "{EDD13697-47E0-47D4-B618-659B307CC72F}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfoPages", "InfoPages\InfoPages.csproj", "{CDFD3152-DC12-426C-98FA-A85A59D0F79F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "uFire_ISE", "uFire_ISE\uFire_ISE.csproj", "{C1493A68-3E11-4B29-A3AC-8A4A56D9D85F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Helpers", "Helpers\Helpers.csproj", "{E8D88711-6F9D-44FA-9F2F-F2470403F67B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{C1493A68-3E11-4B29-A3AC-8A4A56D9D85F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1493A68-3E11-4B29-A3AC-8A4A56D9D85F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1493A68-3E11-4B29-A3AC-8A4A56D9D85F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8D88711-6F9D-44FA-9F2F-F2470403F67B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8D88711-6F9D-44FA-9F2F-F2470403F67B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8D88711-6F9D-44FA-9F2F-F2470403F67B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8D88711-6F9D-44FA-9F2F-F2470403F67B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

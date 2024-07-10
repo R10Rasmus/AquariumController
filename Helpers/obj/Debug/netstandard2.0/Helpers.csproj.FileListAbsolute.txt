@@ -1,0 +1,11 @@
+C:\Users\rasmu\source\repos\AquariumController\Helpers\bin\Debug\netstandard2.0\Helpers.deps.json
+C:\Users\rasmu\source\repos\AquariumController\Helpers\bin\Debug\netstandard2.0\Helpers.dll
+C:\Users\rasmu\source\repos\AquariumController\Helpers\bin\Debug\netstandard2.0\Helpers.pdb
+C:\Users\rasmu\source\repos\AquariumController\Helpers\obj\Debug\netstandard2.0\Helpers.csproj.AssemblyReference.cache
+C:\Users\rasmu\source\repos\AquariumController\Helpers\obj\Debug\netstandard2.0\Helpers.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\rasmu\source\repos\AquariumController\Helpers\obj\Debug\netstandard2.0\Helpers.AssemblyInfoInputs.cache
+C:\Users\rasmu\source\repos\AquariumController\Helpers\obj\Debug\netstandard2.0\Helpers.AssemblyInfo.cs
+C:\Users\rasmu\source\repos\AquariumController\Helpers\obj\Debug\netstandard2.0\Helpers.csproj.CoreCompileInputs.cache
+C:\Users\rasmu\source\repos\AquariumController\Helpers\obj\Debug\netstandard2.0\Helpers.sourcelink.json
+C:\Users\rasmu\source\repos\AquariumController\Helpers\obj\Debug\netstandard2.0\Helpers.dll
+C:\Users\rasmu\source\repos\AquariumController\Helpers\obj\Debug\netstandard2.0\Helpers.pdb

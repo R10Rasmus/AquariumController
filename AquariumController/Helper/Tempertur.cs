@@ -21,7 +21,7 @@ namespace AquariumController.Helper
                 MySqlConnection localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
                 localConn.Open();
 
-                DB.Helper.SaveChannelValue(localConn, "temperature", TemperturValue);
+                Helpers.DB.Helper.SaveChannelValue(localConn, "temperature", TemperturValue);
 
                 localConn.Close();
                 localConn.Dispose();
@@ -35,8 +35,8 @@ namespace AquariumController.Helper
 
         public static void SetupMaxMinTemperature(MySqlConnection conn)
         {
-            int maxTmp = int.Parse(DB.Helper.GetSettingFromDb(conn, "TemperatureMax"));
-            int minTmp = int.Parse(DB.Helper.GetSettingFromDb(conn, "TemperatureMin"));
+            int maxTmp = int.Parse(Helpers.DB.Helper.GetSettingFromDb(conn, "TemperatureMax"));
+            int minTmp = int.Parse(Helpers.DB.Helper.GetSettingFromDb(conn, "TemperatureMin"));
             if ((maxTmp != TemperatureMax) || (minTmp != TemperatureMin))
             {
                 TemperatureMax = maxTmp;

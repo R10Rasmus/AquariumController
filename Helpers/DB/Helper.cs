@@ -1,6 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 
-namespace AquariumController.DB
+namespace Helpers.DB
 {
     public class Helper
     {
