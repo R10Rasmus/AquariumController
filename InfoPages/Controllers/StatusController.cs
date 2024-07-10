@@ -23,7 +23,7 @@ namespace InfoPages.Controllers
             {
                 conn.Open();
 
-                string query = "SELECT title, value FROM settings WHERE title IN ('FanCoolerOnOff', 'ExtraCoolerOnOff')"; // Replace 'statusTable' with your actual table name
+                string query = "SELECT title, value FROM settings WHERE title IN ('FanCoolerrOnOff', 'ExtraCoolerOnOff')"; // Replace 'statusTable' with your actual table name
 
                 MySqlCommand cmd = new MySqlCommand(query, conn);
 
@@ -31,7 +31,7 @@ namespace InfoPages.Controllers
                 {
                     while (rdr.Read())
                     {
-                        if (rdr["title"].ToString() == "FanCoolerOnOff")
+                        if (rdr["title"].ToString() == "FanCoolerrOnOff")
                         {
                             status.FanCoolerOnOff = rdr["value"].ToString();
                         }
