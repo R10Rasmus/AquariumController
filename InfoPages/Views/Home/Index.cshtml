@@ -87,14 +87,14 @@
 <script>
     $(document).ready(function () {
         $.getJSON("/status/GetStatus", function (data) {
-            var fanStatusColor = !data.FanCoolerOnOff ? "green" : "red";
+            var fanStatusColor = data.FanCoolerOnOff ? "green" : "red";
             var fanHueStatusColor = data.FanCoolerOnOffHue ? "green" : "red";
-            var coolerStatusColor = !data.ExtraCoolerOnOff ? "green" : "red";
+            var coolerStatusColor = data.ExtraCoolerOnOff ? "green" : "red";
             var coolerHueStatusColor = data.ExtraCoolerOnOffHue ? "green" : "red";
 
-            $("#fanStatus").css("background-color", fanStatusColor).text("Fan Status: " + (!data.FanCoolerOnOff ? "On" : "Off"));
+            $("#fanStatus").css("background-color", fanStatusColor).text("Fan Status: " + (data.FanCoolerOnOff ? "On" : "Off"));
             $("#fanHueStatus").css("background-color", fanHueStatusColor).text("Fan Hue: " + (data.FanCoolerOnOffHue ? "On" : "Off"));
-            $("#coolerStatus").css("background-color", coolerStatusColor).text("Cooler Status: " + (!data.ExtraCoolerOnOff ? "On" : "Off"));
+            $("#coolerStatus").css("background-color", coolerStatusColor).text("Cooler Status: " + (data.ExtraCoolerOnOff ? "On" : "Off"));
             $("#coolerHueStatus").css("background-color", coolerHueStatusColor).text("Cooler Hue: " + (data.ExtraCoolerOnOffHue ? "On" : "Off"));
         });
     });

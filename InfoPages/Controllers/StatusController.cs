@@ -58,11 +58,11 @@ namespace InfoPages.Controllers
                     {
                         if (rdr["title"].ToString() == "FanCoolerrOnOff")
                         {
-                            status.FanCoolerOnOff = rdr["value"].ToString();
+                            status.FanCoolerOnOff = bool.Parse( rdr["value"].ToString());
                         }
                         else if (rdr["title"].ToString() == "ExtraCoolerOnOff")
                         {
-                            status.ExtraCoolerOnOff = rdr["value"].ToString();
+                            status.ExtraCoolerOnOff = bool.Parse(rdr["value"].ToString());
                         }
                     }
                 }
@@ -78,10 +78,10 @@ namespace InfoPages.Controllers
 
     public class StatusModel
     {
-        public string FanCoolerOnOff { get; set; }
+        public bool FanCoolerOnOff { get; set; }
 
         public bool FanCoolerOnOffHue { get; set; }
-        public string ExtraCoolerOnOff { get; set; }
+        public bool ExtraCoolerOnOff { get; set; }
 
         public bool ExtraCoolerOnOffHue { get; set; }
     }
