@@ -81,8 +81,11 @@ namespace AquariumController
                     {
 
                         Tempertur.TemperturValue = Convert.ToDouble(uFire_pH.MeasureTemp()) + Tempertur.TemperturCalibrateOffSet;
-
-                        SendSMS.SendSMSAsync(Tempertur.TemperturValue);
+                        //if tempertur is over 25.35 send sms
+                        if (Tempertur.TemperturValue > 25.35)
+                        {
+                            SendSMS.SendSMSAsync(Tempertur.TemperturValue);
+                        }
 
                         Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);
                         cooler.CoolerOnOff(conn);

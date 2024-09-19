@@ -15,7 +15,7 @@ namespace AquariumController.Helper
         private readonly ILocalHueClient client;
         private readonly string FanCoolerName;
         private readonly string ExtraCoolerName;
-        private static readonly TimeSpan _cooldown = TimeSpan.FromMinutes(30);
+        private static readonly TimeSpan _cooldown = TimeSpan.FromSeconds(30);
         private static DateTime _lastSent = DateTime.MinValue;
 
         public Cooler(MySqlConnection conn)
