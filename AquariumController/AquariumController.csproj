@@ -189,6 +189,7 @@
     <Compile Include="Display\Animation.cs" />
     <Compile Include="Display\SetCharacters.cs" />
     <Compile Include="Extension\ConsoleEx.cs" />
+    <Compile Include="Helper\SendSMS.cs" />
     <Compile Include="Helper\AirPump.cs" />
     <Compile Include="Helper\Cooler.cs" />
     <Compile Include="Helper\Fails.cs" />

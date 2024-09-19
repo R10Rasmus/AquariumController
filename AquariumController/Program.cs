@@ -82,6 +82,8 @@ namespace AquariumController
 
                         Tempertur.TemperturValue = Convert.ToDouble(uFire_pH.MeasureTemp()) + Tempertur.TemperturCalibrateOffSet;
 
+                        SendSMS.SendSMSAsync(Tempertur.TemperturValue);
+
                         Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);
                         cooler.CoolerOnOff(conn);
 

@@ -61,5 +61,24 @@ namespace Helpers.DB
             int rdr = cmd.ExecuteNonQuery();
         }
 
+        public static string GetLastSettingValue(MySqlConnection conn)
+        {
+
+            MySqlCommand cmd = new MySqlCommand
+            {
+                CommandText = "SELECT * FROM temperature ORDER BY id desc LIMIT 1",
+                Connection = conn
+            };
+
+            MySqlDataReader rdr = cmd.ExecuteReader();
+            rdr.Read();
+
+            string value = rdr["created_at"].ToString();
+
+            rdr.Close();
+
+            return value;
+        }
+
     }
 }

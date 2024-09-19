@@ -21,7 +21,7 @@ namespace AquariumController.Helper
             MySqlConnection localConn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
             localConn.Open();
 
-            DB.Helper.SaveFail(localConn, allMessages, allStackTraces);
+            Helpers.DB.Helper.SaveFail(localConn, allMessages, allStackTraces);
 
             localConn.Close();
             localConn.Dispose();
