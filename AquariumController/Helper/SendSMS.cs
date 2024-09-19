@@ -39,7 +39,7 @@ namespace AquariumController.Helper
             }
 
             // Retrieve configuration settings
-            var apiToken = "7jalEAQFSM-YAtAte6eMDFMPQPZkpAYbW0H-E-1Bez7UEhK_fDUJccup_pwZ14bj";
+            var apiToken = "";
 
             // Set up the authorization header
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
@@ -51,7 +51,7 @@ namespace AquariumController.Helper
             {
                 sender = "Akvarium alarm",
                 message = $"ALARM Tempertur {tempertur}",
-                recipients = new[] { new { msisdn = 45_3141_9498 } }, // Ensure msisdn is correctly formatted
+                recipients = new[] { new { msisdn = +4531419498 } }, // Ensure msisdn is correctly formatted
             };
 
             try

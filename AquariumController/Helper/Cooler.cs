@@ -15,6 +15,8 @@ namespace AquariumController.Helper
         private readonly ILocalHueClient client;
         private readonly string FanCoolerName;
         private readonly string ExtraCoolerName;
+        private static readonly TimeSpan _cooldown = TimeSpan.FromMinutes(30);
+        private static DateTime _lastSent = DateTime.MinValue;
 
         public Cooler(MySqlConnection conn)
         {
@@ -46,6 +48,17 @@ namespace AquariumController.Helper
         }
         public void CoolerOnOff(MySqlConnection conn)
         {
+
+            var timeSinceLastSend = DateTime.UtcNow - _lastSent;
+            if (timeSinceLastSend < _cooldown)
+            {
+                var remainingTime = _cooldown - timeSinceLastSend;
+                ConsoleEx.WriteLineWithDate($"Cannot turn on/ off yet. Please wait {remainingTime.Minutes} minutes and {remainingTime.Seconds} seconds.");
+                return;
+            }
+
+            // Update the last sent time to start the cooldown
+            _lastSent = DateTime.UtcNow;
 
             if (bool.TryParse(Helpers.DB.Helper.GetSettingFromDb(conn, "FanCoolerrOnOff"), out bool fanResult) && !string.IsNullOrEmpty(FanCoolerName))
             {
