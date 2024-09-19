@@ -16,7 +16,7 @@ namespace AquariumController.Helper
         private readonly ILocalHueClient client;
         private readonly string FanCoolerName;
         private readonly string ExtraCoolerName;
-        private static readonly TimeSpan _cooldown = TimeSpan.FromSeconds(30);
+        private static readonly TimeSpan _cooldown = TimeSpan.FromMinutes(2);
         private static DateTime _lastSent = DateTime.MinValue;
 
         public Cooler(MySqlConnection conn)
@@ -80,30 +80,33 @@ namespace AquariumController.Helper
             //and if it is more then 2 min since it last was turned on/off, sow we do not now turn on off if the temperature is around max/min
             if (_temperature > 0 && _lastturnOnOff.AddMinutes(2) < DateTime.Now)
             {
+
                 _lastturnOnOff = DateTime.Now;
                 //if temperature is over max, then turn on cooler
                 if (_temperature > Tempertur.TemperatureMax)
                 {
+                    ConsoleEx.WriteLineWithDate($"Temperature is {_temperature} and is over max {Tempertur.TemperatureMax}, turning on cooler");
                     Helpers.DB.Helper.SaveSettingValue(conn, "FanCoolerrOnOff", true.ToString());
 
                     if (_temperature > Tempertur.TemperatureMax + 0.2)
                     {
+                        ConsoleEx.WriteLineWithDate($"Temperature is {_temperature} and is over {Tempertur.TemperatureMax+0.2}, turning on extra cooler");
                         Helpers.DB.Helper.SaveSettingValue(conn, "ExtraCoolerOnOff", true.ToString());
 
                     }
+
+                    if (_temperature < Tempertur.TemperatureMax + 0.1)
+                    {
+                        ConsoleEx.WriteLineWithDate($"Temperature is {_temperature} and is under {Tempertur.TemperatureMax + 0.1}, turning off extra cooler");
+                        Helpers.DB.Helper.SaveSettingValue(conn, "ExtraCoolerOnOff", false.ToString());
+
+                    }
                 }
-
-                if (_temperature < Tempertur.TemperatureMax + 0.1)
+                else
                 {
-                    Helpers.DB.Helper.SaveSettingValue(conn, "ExtraCoolerOnOff", false.ToString());
-
-                }
-
-
-                //if temperature is under TemperatureMax, then turn off cooler
-                if (_temperature < Tempertur.TemperatureMax)
-                {
+                    ConsoleEx.WriteLineWithDate($"Temperature is {_temperature} and is under {Tempertur.TemperatureMax}, turning off cooler and extra cooler");
                     Helpers.DB.Helper.SaveSettingValue(conn, "FanCoolerrOnOff", false.ToString());
+                    Helpers.DB.Helper.SaveSettingValue(conn, "ExtraCoolerOnOff", false.ToString());
 
                 }
             }

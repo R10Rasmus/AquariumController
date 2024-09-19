@@ -84,7 +84,9 @@ namespace AquariumController
                         //if tempertur is over 25.35 send sms
                         if (Tempertur.TemperturValue > 25.35)
                         {
-                            SendSMS.SendSMSAsync(Tempertur.TemperturValue);
+                            string SMSapiToken = Helpers.DB.Helper.GetSettingFromDb(conn, "SMSapiToken");
+                            string PhonNumber = Helpers.DB.Helper.GetSettingFromDb(conn, "PhonNumber");
+                            SendSMS.SendSMSAsync(Tempertur.TemperturValue, SMSapiToken, PhonNumber);
                         }
 
                         Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);

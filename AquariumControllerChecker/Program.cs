@@ -1,4 +1,5 @@
-﻿using Helpers.DB;
+﻿using Google.Protobuf;
+using Helpers.DB;
 using MySql.Data.MySqlClient;
 using System;
 using System.Configuration;
@@ -15,17 +16,27 @@ namespace AquariumController
         {
             Console.WriteLine("Starter...");
 
+            string format = "dd-MM-yyyy HH:mm:ss";
+            CultureInfo provider = CultureInfo.InvariantCulture;
+
             // Initialize MySQL connection
             using (MySqlConnection conn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString")))
             {
                 conn.Open();
+
+                Console.WriteLine("Connected to the database.");
+
 
                 int saveTemperturIntervaleInMin = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureSaveInterval"));
                 var checkTime = saveTemperturIntervaleInMin * 2;
 
                 Console.WriteLine($"TemperatureSaveInterva is {saveTemperturIntervaleInMin} and check time is {checkTime}");
 
-                DateTime lastRestart = DateTime.Parse(Helper.GetSettingFromDb(conn, "RestartTime"));
+                var dateTimeFromDB = Helper.GetSettingFromDb(conn, "RestartTime");
+
+                DateTime lastRestart = DateTime.ParseExact(dateTimeFromDB, format, provider);
+
+                Console.WriteLine($"Last restart was at {lastRestart.ToString(format, provider)}");
                 while (!Console.KeyAvailable)
                 {
                     try
@@ -41,7 +52,7 @@ namespace AquariumController
                                 // Check if 5 minutes have passed since the last date
                                 if (lastDateDateTime.AddMinutes(checkTime) < DateTime.Now)
                                 {
-                                    Helper.SaveSettingValue(conn, "RestartTime", DateTime.Now.ToString());
+                                    Helper.SaveSettingValue(conn, "RestartTime", DateTime.Now.ToString(format, CultureInfo.InvariantCulture));
                                     RestartMachine();
                                 }
                             }
