@@ -51,7 +51,7 @@ namespace AquariumController.Helper
             {
                 sender = "Akv. ALARM",
                 message = $"ALARM Tempertur {tempertur}",
-                recipients = new[] { new { msisdn =  } }, // Ensure msisdn is correctly formatted
+                recipients = new[] { new { msisdn = 0045_1234_5678 } }, // Ensure msisdn is correctly formatted 0045_1234_5678
             };
 
             try

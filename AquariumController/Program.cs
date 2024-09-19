@@ -47,7 +47,7 @@ namespace AquariumController
             cooler = new Cooler(conn);
 
             Timer saveTemperturTimer = Settings.SetupSaveInterval(conn, "TemperatureSaveInterval", Tempertur.SaveTempertur);
-            Timer savePhTimer = Settings.SetupSaveInterval(conn, "PHSaveInterval", Ph.SavePh);
+            //Timer savePhTimer = Settings.SetupSaveInterval(conn, "PHSaveInterval", Ph.SavePh);
 
             //read setting every 5 minute.
             AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);
@@ -90,15 +90,15 @@ namespace AquariumController
                         Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);
                         cooler.CoolerOnOff(conn);
 
-                        Ph.PH = Math.Round(uFire_pH.MeasurepH(), 1);
+                      //  Ph.PH = Math.Round(uFire_pH.MeasurepH(), 1);
 
-                        var roundTemp = Math.Round(Tempertur.TemperturValue, 1, MidpointRounding.AwayFromZero);
+                        var roundTemp = Math.Round(Tempertur.TemperturValue, 3, MidpointRounding.AwayFromZero);
 
                         string tempterturText = roundTemp.ToString() + (char)SetCharacters.TemperatureCharactersNumber;
 
-                        string pHText = Ph.PH + "pH";
+                      //  string pHText = Ph.PH + "pH";
 
-                        console.ReplaceLine(0, tempterturText + " " + pHText);
+                        console.ReplaceLine(0, tempterturText );
 
                         Animation.ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
 
@@ -136,7 +136,7 @@ namespace AquariumController
             }
 
             saveTemperturTimer.Dispose();
-            savePhTimer.Dispose();
+            //savePhTimer.Dispose();
             readSetupTimer.Dispose();
 
             conn.Close();

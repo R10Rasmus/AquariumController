@@ -5,6 +5,7 @@ using Q42.HueApi.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace AquariumController.Helper
 {
@@ -52,8 +53,6 @@ namespace AquariumController.Helper
             var timeSinceLastSend = DateTime.UtcNow - _lastSent;
             if (timeSinceLastSend < _cooldown)
             {
-                var remainingTime = _cooldown - timeSinceLastSend;
-                ConsoleEx.WriteLineWithDate($"Cannot turn on/ off yet. Please wait {remainingTime.Minutes} minutes and {remainingTime.Seconds} seconds.");
                 return;
             }
 
@@ -64,6 +63,9 @@ namespace AquariumController.Helper
             {
                 TurnFanCoolerOnOff(fanResult);
             }
+
+            //wait 0.5 sec before turning on/off extra cooler
+            Thread.Sleep(500);
 
             if (bool.TryParse(Helpers.DB.Helper.GetSettingFromDb(conn, "ExtraCoolerOnOff"), out bool extraResult) && !string.IsNullOrEmpty(FanCoolerName))
             {
@@ -109,13 +111,14 @@ namespace AquariumController.Helper
 
         private void TurnFanCoolerOnOff(bool on)
         {
-            LightCommand lightCommand = new LightCommand() { On = on };
+            
             var light = GetLight(FanCoolerName);
             if(light == null)
             {
                 ConsoleEx.WriteLineWithDate($"Fan Cooler not found!");
                 return;
             }
+            LightCommand lightCommand = new LightCommand() { On = on };
             client.SendCommandAsync(lightCommand, new List<string> { light.Id });
 
             ConsoleEx.WriteLineWithDate($"Fan Cooler {(on ? "on" : "off")}!");
@@ -124,7 +127,7 @@ namespace AquariumController.Helper
         private void TurnExtraCoolerOnOff(bool on)
         {
 
-            var light = GetLight(FanCoolerName);
+            var light = GetLight(ExtraCoolerName);
             if (light == null)
             {
                 ConsoleEx.WriteLineWithDate($"Extra Cooler not found!");

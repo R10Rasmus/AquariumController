@@ -13,28 +13,46 @@ namespace AquariumController
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Starter...");
+
             // Initialize MySQL connection
             using (MySqlConnection conn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString")))
             {
                 conn.Open();
 
+                int saveTemperturIntervaleInMin = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureSaveInterval"));
+                var checkTime = saveTemperturIntervaleInMin * 2;
+
+                Console.WriteLine($"TemperatureSaveInterva is {saveTemperturIntervaleInMin} and check time is {checkTime}");
+
+                DateTime lastRestart = DateTime.Parse(Helper.GetSettingFromDb(conn, "RestartTime"));
                 while (!Console.KeyAvailable)
                 {
                     try
                     {
-                        string lastDate = Helper.GetLastSettingValue(conn);
-
-                        if (DateTime.TryParse(lastDate, out DateTime lastDateDateTime))
+                        // Check if 20 minutes have passed since the last restart
+                        if (lastRestart.AddMinutes(20) < DateTime.Now)
                         {
-                            // Check if 5 minutes have passed since the last date
-                            if (lastDateDateTime.AddMinutes(5) < DateTime.Now)
+
+                            string lastDate = Helper.GetLastSettingValue(conn);
+
+                            if (DateTime.TryParse(lastDate, out DateTime lastDateDateTime))
                             {
-                                RestartMachine();
+                                // Check if 5 minutes have passed since the last date
+                                if (lastDateDateTime.AddMinutes(checkTime) < DateTime.Now)
+                                {
+                                    Helper.SaveSettingValue(conn, "RestartTime", DateTime.Now.ToString());
+                                    RestartMachine();
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Failed to parse the lastDate value.");
                             }
                         }
                         else
                         {
-                            Console.WriteLine("Failed to parse the lastDate value.");
+                            Console.WriteLine("Not time to restart yet.");
                         }
                     }
                     catch (Exception ex)
@@ -84,7 +102,7 @@ namespace AquariumController
                 }
                 else
                 {
-                    // Optionally, wait for the process to exit
+                    // Optionally, wait for the process to exitu
                     process.WaitForExit();
                 }
 
