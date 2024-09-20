@@ -19,37 +19,65 @@ namespace AquariumController
             string format = "dd-MM-yyyy HH:mm:ss";
             CultureInfo provider = CultureInfo.InvariantCulture;
 
-            // Initialize MySQL connection
-            using (MySqlConnection conn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString")))
+            MySqlConnection conn = null;
+
+            // Retry logic for establishing the database connection
+            int counter = 0;
+            while (true)
             {
-                conn.Open();
-
-                Console.WriteLine("Connected to the database.");
-
-
-                int saveTemperturIntervaleInMin = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureSaveInterval"));
-                var checkTime = saveTemperturIntervaleInMin * 2;
-
-                Console.WriteLine($"TemperatureSaveInterva is {saveTemperturIntervaleInMin} and check time is {checkTime}");
-
-                var dateTimeFromDB = Helper.GetSettingFromDb(conn, "RestartTime");
-
-                DateTime lastRestart = DateTime.ParseExact(dateTimeFromDB, format, provider);
-
-                Console.WriteLine($"Last restart was at {lastRestart.ToString(format, provider)}");
-                while (!Console.KeyAvailable)
+                counter++;
+                try
                 {
-                    try
+                    string connectionString = ConfigurationManager.AppSettings.Get("ConnectionString");
+                    conn = new MySqlConnection(connectionString);
+                    conn.Open();
+                    Console.WriteLine("Connected to the database.");
+                    break; // Exit the loop if connection is successful
+                }
+                catch (Exception ex)
+                {
+                    if(counter > 5)
                     {
-                        // Check if 20 minutes have passed since the last restart
-                        if (lastRestart.AddMinutes(20) < DateTime.Now)
-                        {
+                        Console.WriteLine($"{DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("da-dk"))} Failed to connect to the database: {ex.Message}");
+                        Console.WriteLine("Exiting the application...");
+                        Environment.Exit(1); // Exit the application if the connection fails after 5 attempts
+                    }
+                    Console.WriteLine($"{DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("da-dk"))} Failed to connect to the database: {ex.Message}");
+                    Console.WriteLine("Retrying in 1 minute...");
+                    Thread.Sleep(TimeSpan.FromMinutes(1)); // Wait for 1 minute before retrying
+                }
+            }
 
+            using (conn)
+            {
+                try
+                {
+                    int saveTemperatureIntervalInMin = int.Parse(Helper.GetSettingFromDb(conn, "TemperatureSaveInterval"));
+                    var checkTime = saveTemperatureIntervalInMin * 2;
+
+                    Console.WriteLine($"TemperatureSaveInterval is {saveTemperatureIntervalInMin} and check time is {checkTime}");
+
+                    var dateTimeFromDB = Helper.GetSettingFromDb(conn, "RestartTime");
+
+                    if (!DateTime.TryParseExact(dateTimeFromDB, format, provider, DateTimeStyles.None, out DateTime lastRestart))
+                    {
+                        Console.WriteLine("Failed to parse the RestartTime value from the database.");
+                        lastRestart = DateTime.Now;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Last restart was at {lastRestart.ToString(format, provider)}");
+                    }
+
+                    while (!Console.KeyAvailable)
+                    {
+                        try
+                        {
                             string lastDate = Helper.GetLastSettingValue(conn);
 
                             if (DateTime.TryParse(lastDate, out DateTime lastDateDateTime))
                             {
-                                // Check if 5 minutes have passed since the last date
+                                // Check if the specified checkTime minutes have passed since the last date
                                 if (lastDateDateTime.AddMinutes(checkTime) < DateTime.Now)
                                 {
                                     Helper.SaveSettingValue(conn, "RestartTime", DateTime.Now.ToString(format, CultureInfo.InvariantCulture));
@@ -61,24 +89,46 @@ namespace AquariumController
                                 Console.WriteLine("Failed to parse the lastDate value.");
                             }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            Console.WriteLine("Not time to restart yet.");
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"{DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("da-dk"))} Got an error: {ex.Message} StackTrace: {ex.StackTrace}");
+                            Console.WriteLine($"{DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("da-dk"))} Got an error: {ex.Message} StackTrace: {ex.StackTrace}");
 
-                        if (ex.InnerException != null)
+                            if (ex.InnerException != null)
+                            {
+                                Console.WriteLine($"{DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("da-dk"))} Error InnerException: {ex.InnerException.Message}");
+                            }
+
+                            // Attempt to reconnect if the connection is lost
+                            if (ex is MySqlException || ex is InvalidOperationException)
+                            {
+                                Console.WriteLine("Attempting to reconnect to the database...");
+                                while (true)
+                                {
+                                    try
+                                    {
+                                        conn.Close(); // Ensure the previous connection is closed
+                                        conn.Open();
+                                        Console.WriteLine("Reconnected to the database.");
+                                        break; // Exit the reconnect loop
+                                    }
+                                    catch (Exception reconnectEx)
+                                    {
+                                        Console.WriteLine($"{DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("da-dk"))} Reconnection failed: {reconnectEx.Message}");
+                                        Console.WriteLine("Retrying in 1 minute...");
+                                        Thread.Sleep(TimeSpan.FromMinutes(1));
+                                    }
+                                }
+                            }
+                        }
+                        finally
                         {
-                            Console.WriteLine($"{DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("da-dk"))} Error InnerException: {ex.InnerException.Message}");
+                            Thread.Sleep(1000); // Sleep for 1 second before the next check
                         }
                     }
-                    finally
-                    {
-                        Thread.Sleep(1000); // Sleep for 1 second before the next check
-                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{DateTime.Now.ToString(CultureInfo.CreateSpecificCulture("da-dk"))} An unexpected error occurred: {ex.Message}");
                 }
             }
         }
@@ -113,7 +163,7 @@ namespace AquariumController
                 }
                 else
                 {
-                    // Optionally, wait for the process to exitu
+                    // Optionally, wait for the process to exit
                     process.WaitForExit();
                 }
 
