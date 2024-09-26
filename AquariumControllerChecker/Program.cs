@@ -1,11 +1,9 @@
-﻿using Google.Protobuf;
-using Helpers.DB;
+﻿using Helpers.DB;
 using MySql.Data.MySqlClient;
 using System;
 using System.Configuration;
 using System.Diagnostics; // For executing system commands
 using System.Globalization;
-using System.Reflection; // For retrieving the executable path (if needed)
 using System.Threading;
 
 namespace AquariumController
@@ -73,20 +71,25 @@ namespace AquariumController
                     {
                         try
                         {
-                            string lastDate = Helper.GetLastSettingValue(conn);
+                            // Check if the specified checkTime minutes have passed since the last restart
+                            if (lastRestart.AddMinutes(checkTime) < DateTime.Now)
+                            {
 
-                            if (DateTime.TryParse(lastDate, out DateTime lastDateDateTime))
-                            {
-                                // Check if the specified checkTime minutes have passed since the last date
-                                if (lastDateDateTime.AddMinutes(checkTime) < DateTime.Now)
+                                string lastDate = Helper.GetLastSettingValue(conn);
+
+                                if (DateTime.TryParse(lastDate, out DateTime lastDateDateTime))
                                 {
-                                    Helper.SaveSettingValue(conn, "RestartTime", DateTime.Now.ToString(format, CultureInfo.InvariantCulture));
-                                    RestartMachine();
+                                    // Check if the specified checkTime minutes have passed since the last date
+                                    if (lastDateDateTime.AddMinutes(checkTime) < DateTime.Now)
+                                    {
+                                        Helper.SaveSettingValue(conn, "RestartTime", DateTime.Now.ToString(format, CultureInfo.InvariantCulture));
+                                        RestartMachine();
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Failed to parse the lastDate value.");
+                                else
+                                {
+                                    Console.WriteLine("Failed to parse the lastDate value.");
+                                }
                             }
                         }
                         catch (Exception ex)

@@ -82,7 +82,7 @@ namespace AquariumController
 
                         Tempertur.TemperturValue = Convert.ToDouble(uFire_pH.MeasureTemp()) + Tempertur.TemperturCalibrateOffSet;
                         //if tempertur is over 25.35 or under 24,35 send sms
-                        if (Tempertur.TemperturValue > 25.35 || Tempertur.TemperturValue < 24.35)
+                        if (Tempertur.TemperturValue > 25.35 || (Tempertur.TemperturValue < 24.35 && Tempertur.TemperturValue > 20) )
                         {
                             string SMSapiToken = Helpers.DB.Helper.GetSettingFromDb(conn, "SMSapiToken");
                             string PhonNumber = Helpers.DB.Helper.GetSettingFromDb(conn, "PhonNumber");

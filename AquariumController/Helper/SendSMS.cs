@@ -14,7 +14,7 @@ namespace AquariumController.Helper
     {
         private static readonly HttpClient client = new HttpClient();
         private static DateTime _lastSent = DateTime.MinValue;
-        private static readonly TimeSpan _cooldown = TimeSpan.FromMinutes(30);
+        private static readonly TimeSpan _cooldown = TimeSpan.FromHours(2);
         private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         public static async Task SendSMSAsync(double tempertur, string SMSapiToken, string PhonNumber)
@@ -27,7 +27,7 @@ namespace AquariumController.Helper
                 if (timeSinceLastSend < _cooldown)
                 {
                     var remainingTime = _cooldown - timeSinceLastSend;
-                    ConsoleEx.WriteLineWithDate($"Cannot send SMS yet. Please wait {remainingTime.Minutes} minutes and {remainingTime.Seconds} seconds.");
+                  //  ConsoleEx.WriteLineWithDate($"Cannot send SMS yet. Please wait {remainingTime.Minutes} minutes and {remainingTime.Seconds} seconds.");
                     return;
                 }
 
@@ -53,7 +53,7 @@ namespace AquariumController.Helper
             {
                 sender = "Akv. ALARM",
                 message = $"ALARM Tempertur {tempertur}",
-                recipients = new[] { new { msisdn = PhonNumber } }, // Ensure msisdn is correctly formatted 0045_1234_5678
+                recipients = new[] { new { msisdn = formatted } }, // Ensure msisdn is correctly formatted 0045_1234_5678
             };
 
             try
