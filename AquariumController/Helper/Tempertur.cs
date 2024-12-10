@@ -75,7 +75,7 @@ namespace AquariumController.Helper
                             if (int.TryParse(tempString, out int tempMilli))
                             {
                                 // Convert to double by dividing by 1000.0
-                                double temperature = tempMilli / 1000.0;
+                                double temperature = (tempMilli / 1000.0) - TemperturCalibrateOffSet;
 
                                 list.Add(temperature);
 
