@@ -27,7 +27,7 @@ namespace AquariumController
         // Base path where the device directories are located
         static string basePath = "/sys/bus/w1/devices/";
 
-        static async void Main(string[] args)
+        static void Main(string[] args)
         {
             Cooler cooler = null;
 
@@ -108,7 +108,7 @@ namespace AquariumController
                         {
                             string SMSapiToken = Helpers.DB.Helper.GetSettingFromDb(conn, "SMSapiToken");
                             string PhonNumber = Helpers.DB.Helper.GetSettingFromDb(conn, "PhonNumber");
-                            await SendSMS.SendSMSAsync(Tempertur.TemperturValue, SMSapiToken, PhonNumber);
+                            SendSMS.SendSMSAsync(Tempertur.TemperturValue, SMSapiToken, PhonNumber);
                         }
 
                         Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);
