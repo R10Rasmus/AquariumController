@@ -3,12 +3,14 @@ using AquariumController.Extension;
 using AquariumController.Helper;
 using Lcd1602Controller;
 using MySql.Data.MySqlClient;
+using Renci.SshNet.Messages;
 using System;
 using System.Configuration;
 using System.Device.Gpio;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using UnitsNet;
 
 namespace AquariumController
 {
@@ -80,17 +82,20 @@ namespace AquariumController
 
                         Tempertur.TemperturValue = temperatur.FirstOrDefault();
                         //if tempertur is over 26.35 or under 25,8 send sms
-                        if (Tempertur.TemperturValue > 26.35 || (Tempertur.TemperturValue < 25.8 && Tempertur.TemperturValue > 20) )
+                        if (Tempertur.TemperturValue > 26.35 || (Tempertur.TemperturValue < 25.8) )
                         {
                             string SMSapiToken = Helpers.DB.Helper.GetSettingFromDb(conn, "SMSapiToken");
                             string PhonNumber = Helpers.DB.Helper.GetSettingFromDb(conn, "PhonNumber");
-                            SendSMS.SendSMSAsync(Tempertur.TemperturValue, SMSapiToken, PhonNumber);
+                            if(Tempertur.TemperturValue > 26.35)
+                                SendSMS.SendSMSAsync(Tempertur.TemperturValue, SMSapiToken, PhonNumber,  $"Tempertur is to highe Tempertur {Tempertur.TemperturValue}");
+                            else
+                                SendSMS.SendSMSAsync(Tempertur.TemperturValue, SMSapiToken, PhonNumber, $"Tempertur is to low Tempertur {Tempertur.TemperturValue}");
                         }
                         if (Tempertur.TemperturValue > 27)
                         {
                             string SMSapiToken = Helpers.DB.Helper.GetSettingFromDb(conn, "SMSapiToken");
                             string PhonNumber = Helpers.DB.Helper.GetSettingFromDb(conn, "PhonNumber");
-                            SendSMS.SendSMSAsync(Tempertur.TemperturValue, SMSapiToken, PhonNumber);
+                            SendSMS.SendSMSAsync(Tempertur.TemperturValue, SMSapiToken, PhonNumber, $"ALARM!! Temperature is WAY too high.{Tempertur.TemperturValue}", true);
                         }
 
                         Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);

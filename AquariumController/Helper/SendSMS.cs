@@ -18,7 +18,7 @@ namespace AquariumController.Helper
         private static readonly TimeSpan _cooldown = TimeSpan.FromHours(2);
         private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-        public static async Task SendSMSAsync(double tempertur, string SMSapiToken, string PhonNumber, bool alarm=false)
+        public static async Task SendSMSAsync(double tempertur, string SMSapiToken, string PhonNumber, string message, bool alarm=false)
         {
             // Asynchronous locking to ensure thread safety
             await _semaphore.WaitAsync();
@@ -54,16 +54,11 @@ namespace AquariumController.Helper
             string formatted = FormatPhoneNumberRegex(PhonNumber);
 
             ConsoleEx.WriteLineWithDate($"Sending SMS to {formatted}...");
-            string message = $"Tempertur is to highe Tempertur {tempertur}";
-            if (alarm)
-            {
-                ConsoleEx.WriteLineWithDate($"ALARM Tempertur {tempertur}");
-                message = $"ALARM!! Tempertur {tempertur}";
-            }
+
             var messages = new
             {
                 sender = "Akv. ALARM",
-                message = message,
+                 message,
                 recipients = new[] { new { msisdn = formatted } }, // Ensure msisdn is correctly formatted 0045_1234_5678
             };
 
