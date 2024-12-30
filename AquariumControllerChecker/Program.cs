@@ -75,15 +75,19 @@ namespace AquariumController
                             if (lastRestart.AddMinutes(checkTime) < DateTime.Now)
                             {
 
-                                string lastDate = Helper.GetLastSettingValue(conn);
+                                string lastTemperturSavedTime = Helper.GetLastTemperturSavedTime(conn);
 
-                                if (DateTime.TryParse(lastDate, out DateTime lastDateDateTime))
+                                if (DateTime.TryParse(lastTemperturSavedTime, out DateTime lastDateDateTime))
                                 {
                                     // Check if the specified checkTime minutes have passed since the last date
                                     if (lastDateDateTime.AddMinutes(checkTime) < DateTime.Now)
                                     {
                                         Helper.SaveSettingValue(conn, "RestartTime", DateTime.Now.ToString(format, CultureInfo.InvariantCulture));
                                         RestartMachine();
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"The time is {DateTime.Now}, last saved timertur is {lastTemperturSavedTime}");
                                     }
                                 }
                                 else
@@ -125,7 +129,7 @@ namespace AquariumController
                         }
                         finally
                         {
-                            Thread.Sleep(1000); // Sleep for 1 second before the next check
+                            Thread.Sleep(30000); // Wait for 30 seconds before checking again
                         }
                     }
                 }

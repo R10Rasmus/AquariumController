@@ -4,13 +4,18 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using UnitsNet;
 
 namespace AquariumController.Helper
 {
     public static class Tempertur
     {
-        public const double TemperturCalibrateOffSet = 0.9;
+
+        // Base path where the device directories are located
+        static string basePath = "/sys/bus/w1/devices/";
+
+        public const double TemperturCalibrateOffSet = 0;
 
         public static double TemperturValue = 0;
         public static double TemperatureMin = 0;
@@ -49,6 +54,33 @@ namespace AquariumController.Helper
                 ConsoleEx.WriteLineWithDate($"TemperatureMin is {TemperatureMin}");
             }
                 
+        }
+
+        // Get all directories in the base path that start with "28"
+        public static IEnumerable<string> GetDirectories()
+        {
+            IEnumerable<string> directories = null;
+            try
+            {
+                // Get all directories in the base path that start with "28"
+                directories = Directory.GetDirectories(basePath)
+                                          .Where(dir => Path.GetFileName(dir).StartsWith("28"));
+
+                if (!directories.Any())
+                {
+                    Console.WriteLine("No device directories starting with '28' were found.");
+                }
+            }
+            catch (DirectoryNotFoundException)
+            {
+                Console.WriteLine($"[Error] The directory {basePath} does not exist.");
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Console.WriteLine($"[Error] Access to the directory {basePath} is denied.");
+            }
+
+            return directories;
         }
 
         public static List<double> ReadTemperatur(IEnumerable<string> directories)
@@ -93,6 +125,8 @@ namespace AquariumController.Helper
                     else
                     {
                         Console.WriteLine($"[Warning] Temperature file not found in directory {dir}.");
+                        Console.WriteLine($"Trying to find new directory!");
+                        GetDirectories();
                     }
                 }
             }

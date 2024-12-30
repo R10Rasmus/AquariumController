@@ -61,7 +61,7 @@ namespace Helpers.DB
             int rdr = cmd.ExecuteNonQuery();
         }
 
-        public static string GetLastSettingValue(MySqlConnection conn)
+        public static string GetLastTemperturSavedTime(MySqlConnection conn)
         {
 
             MySqlCommand cmd = new MySqlCommand
