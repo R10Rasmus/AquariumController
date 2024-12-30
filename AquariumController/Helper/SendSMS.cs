@@ -14,25 +14,31 @@ namespace AquariumController.Helper
     {
         private static readonly HttpClient client = new HttpClient();
         private static DateTime _lastSent = DateTime.MinValue;
+        private static bool sendAlarm = false;
         private static readonly TimeSpan _cooldown = TimeSpan.FromHours(2);
         private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-        public static async Task SendSMSAsync(double tempertur, string SMSapiToken, string PhonNumber)
+        public static async Task SendSMSAsync(double tempertur, string SMSapiToken, string PhonNumber, bool alarm=false)
         {
             // Asynchronous locking to ensure thread safety
             await _semaphore.WaitAsync();
             try
             {
+                if (alarm && !sendAlarm)
+                {
+                    sendAlarm = true;
+                    _lastSent = DateTime.MinValue;
+                }
+
                 var timeSinceLastSend = DateTime.UtcNow - _lastSent;
                 if (timeSinceLastSend < _cooldown)
                 {
-                    var remainingTime = _cooldown - timeSinceLastSend;
-                  //  ConsoleEx.WriteLineWithDate($"Cannot send SMS yet. Please wait {remainingTime.Minutes} minutes and {remainingTime.Seconds} seconds.");
                     return;
                 }
 
-                // Update the last sent time to start the cooldown
+                // Start cooldown
                 _lastSent = DateTime.UtcNow;
+                sendAlarm = false;
             }
             finally
             {
@@ -48,11 +54,16 @@ namespace AquariumController.Helper
             string formatted = FormatPhoneNumberRegex(PhonNumber);
 
             ConsoleEx.WriteLineWithDate($"Sending SMS to {formatted}...");
-
+            string message = $"Tempertur is to highe Tempertur {tempertur}";
+            if (alarm)
+            {
+                ConsoleEx.WriteLineWithDate($"ALARM Tempertur {tempertur}");
+                message = $"ALARM!! Tempertur {tempertur}";
+            }
             var messages = new
             {
                 sender = "Akv. ALARM",
-                message = $"ALARM Tempertur {tempertur}",
+                message = message,
                 recipients = new[] { new { msisdn = formatted } }, // Ensure msisdn is correctly formatted 0045_1234_5678
             };
 

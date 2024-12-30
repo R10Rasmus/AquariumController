@@ -79,8 +79,14 @@ namespace AquariumController
 
 
                         Tempertur.TemperturValue = temperatur.FirstOrDefault();
-                        //if tempertur is over 25.35 or under 24,35 send sms
-                        if (Tempertur.TemperturValue > 25.35 || (Tempertur.TemperturValue < 24.35 && Tempertur.TemperturValue > 20) )
+                        //if tempertur is over 26.35 or under 25,8 send sms
+                        if (Tempertur.TemperturValue > 26.35 || (Tempertur.TemperturValue < 25.8 && Tempertur.TemperturValue > 20) )
+                        {
+                            string SMSapiToken = Helpers.DB.Helper.GetSettingFromDb(conn, "SMSapiToken");
+                            string PhonNumber = Helpers.DB.Helper.GetSettingFromDb(conn, "PhonNumber");
+                            SendSMS.SendSMSAsync(Tempertur.TemperturValue, SMSapiToken, PhonNumber);
+                        }
+                        if (Tempertur.TemperturValue > 27)
                         {
                             string SMSapiToken = Helpers.DB.Helper.GetSettingFromDb(conn, "SMSapiToken");
                             string PhonNumber = Helpers.DB.Helper.GetSettingFromDb(conn, "PhonNumber");
