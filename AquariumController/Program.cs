@@ -22,8 +22,6 @@ namespace AquariumController
         const int LCDRSPIN = 07;
         const int LCDENABLEPIN = 08;
         static readonly int[] LCDDATA = { 06, 13, 19, 26 };
-        //static GpioController _Controller;
-
         static void Main(string[] args)
         {
             Cooler cooler = null;
@@ -43,10 +41,6 @@ namespace AquariumController
             //read setting every 5 minute.
             AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);
             Timer readSetupTimer = new Timer(Settings.ReadSetup, saveTemperturAutoResetEvent, 0, 5 * 60 * 1000);
-
-            ConsoleEx.WriteLineWithDate("Setting up GpioController....");
-            //_Controller = new GpioController();
-            //_Controller.OpenPin(AIRPUMPPIN, PinMode.Output);
 
             ConsoleEx.WriteLineWithDate("Getting devices...");
 
@@ -72,39 +66,60 @@ namespace AquariumController
                 bool _revers = false;
                 int _positionCount = 0;
 
+                var temperatur = Tempertur.ReadTemperatur(directories);
+                Tempertur.TemperturValue = temperatur.FirstOrDefault();
+
+                SendSMS.SendSMSAsync(Tempertur.TemperturValue, conn, $"Restarted tempertur is {Tempertur.TemperturValue}");
+
                 while (!Console.KeyAvailable)
                 {
                     try
                     {
 
-                        var temperatur = Tempertur.ReadTemperatur(directories);
-
-
+                        temperatur = Tempertur.ReadTemperatur(directories);
                         Tempertur.TemperturValue = temperatur.FirstOrDefault();
-                        //if tempertur is over 26.35 or under 25,8 send sms
-                        if (Tempertur.TemperturValue > 26.35 || (Tempertur.TemperturValue < 25.8) )
+
+                        if(Tempertur.TemperturValue == 0)
                         {
-                            string SMSapiToken = Helpers.DB.Helper.GetSettingFromDb(conn, "SMSapiToken");
-                            string PhonNumber = Helpers.DB.Helper.GetSettingFromDb(conn, "PhonNumber");
-                            if(Tempertur.TemperturValue > 26.35)
-                                SendSMS.SendSMSAsync(Tempertur.TemperturValue, SMSapiToken, PhonNumber,  $"Tempertur is to highe Tempertur {Tempertur.TemperturValue}");
-                            else
-                                SendSMS.SendSMSAsync(Tempertur.TemperturValue, SMSapiToken, PhonNumber, $"Tempertur is to low Tempertur {Tempertur.TemperturValue}");
+                            ConsoleEx.WriteLineWithDate("Tempertur is 0, trying to read again");
+                            Thread.Sleep(1000); // wait 1 sec
+                            temperatur = Tempertur.ReadTemperatur(directories);
+                            Tempertur.TemperturValue = temperatur.FirstOrDefault();
                         }
-                        if (Tempertur.TemperturValue > 27)
+                        string tempterturText =string.Empty;
+                        double roundTemp = 0;
+                        if (Tempertur.TemperturValue != 0)
                         {
-                            string SMSapiToken = Helpers.DB.Helper.GetSettingFromDb(conn, "SMSapiToken");
-                            string PhonNumber = Helpers.DB.Helper.GetSettingFromDb(conn, "PhonNumber");
-                            SendSMS.SendSMSAsync(Tempertur.TemperturValue, SMSapiToken, PhonNumber, $"ALARM!! Temperature is WAY too high.{Tempertur.TemperturValue}", true);
+
+                            //if tempertur is over 26.35 or under 25,8 send sms
+                            if (Tempertur.TemperturValue > 26.35 || (Tempertur.TemperturValue < 25.8))
+                            {
+
+                                if (Tempertur.TemperturValue > 26.35)
+                                    SendSMS.SendSMSAsync(Tempertur.TemperturValue, conn, $"Tempertur is to highe Tempertur {Tempertur.TemperturValue}");
+                                else
+                                    SendSMS.SendSMSAsync(Tempertur.TemperturValue, conn, $"Tempertur is to low Tempertur {Tempertur.TemperturValue}");
+                            }
+                            if (Tempertur.TemperturValue > 27)
+                            {
+                                SendSMS.SendSMSAsync(Tempertur.TemperturValue, conn, $"ALARM!! Temperature is WAY too high.{Tempertur.TemperturValue}", true);
+                            }
+
+                            Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);
+                            cooler.CoolerOnOff(conn);
+
+                            roundTemp = Math.Round(Tempertur.TemperturValue, 2, MidpointRounding.AwayFromZero);
+
+                            tempterturText = roundTemp.ToString() + (char)SetCharacters.TemperatureCharactersNumber;
                         }
+                        else
+                        {
+                            ConsoleEx.WriteLineWithDate("Tempertur is still 0, trying to read again");
+                            tempterturText = "ERROR! Could not read tempertur, trying again...";
 
-                        Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);
-                        cooler.CoolerOnOff(conn);
+                            roundTemp = Tempertur.TemperatureMax + 0.2;
 
-                        var roundTemp = Math.Round(Tempertur.TemperturValue, 2, MidpointRounding.AwayFromZero);
-
-                        string tempterturText = roundTemp.ToString() + (char)SetCharacters.TemperatureCharactersNumber;
-
+                        }
                         console.ReplaceLine(0, tempterturText );
 
                         Animation.ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
@@ -143,9 +158,6 @@ namespace AquariumController
 
             conn.Close();
             conn.Dispose();
-
-           // _Controller.Dispose();
-
 
         }
 

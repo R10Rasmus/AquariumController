@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
+using MySql.Data.MySqlClient;
 
 namespace AquariumController.Helper
 {
@@ -18,8 +19,10 @@ namespace AquariumController.Helper
         private static readonly TimeSpan _cooldown = TimeSpan.FromHours(2);
         private static readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-        public static async Task SendSMSAsync(double tempertur, string SMSapiToken, string PhonNumber, string message, bool alarm=false)
+        public static async Task SendSMSAsync(double tempertur, MySqlConnection conn, string message, bool alarm=false)
         {
+            string SMSapiToken = Helpers.DB.Helper.GetSettingFromDb(conn, "SMSapiToken");
+            string PhonNumber = Helpers.DB.Helper.GetSettingFromDb(conn, "PhonNumber");
             // Asynchronous locking to ensure thread safety
             await _semaphore.WaitAsync();
             try
