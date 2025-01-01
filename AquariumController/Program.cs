@@ -83,6 +83,7 @@ namespace AquariumController
                         {
                             ConsoleEx.WriteLineWithDate("Tempertur is 0, trying to read again");
                             Thread.Sleep(1000); // wait 1 sec
+                            directories = Tempertur.GetDirectories();
                             temperatur = Tempertur.ReadTemperatur(directories);
                             Tempertur.TemperturValue = temperatur.FirstOrDefault();
                         }
