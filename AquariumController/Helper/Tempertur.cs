@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using UnitsNet;
 
 namespace AquariumController.Helper
@@ -102,6 +103,11 @@ namespace AquariumController.Helper
                         {
                             // Read the temperature value as a string
                             string tempString = File.ReadAllText(tempFilePath).Trim();
+
+                            if (string.IsNullOrEmpty(tempString)) {
+                                Thread.Sleep(10000); // waite for 10 sec
+                                tempString  = File.ReadAllText(tempFilePath).Trim();
+                            }
 
                             // Parse the string to an integer
                             if (int.TryParse(tempString, out int tempMilli))

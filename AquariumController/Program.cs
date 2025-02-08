@@ -69,7 +69,16 @@ namespace AquariumController
                 var temperatur = Tempertur.ReadTemperatur(directories);
                 Tempertur.TemperturValue = temperatur.FirstOrDefault();
 
+                if (Tempertur.TemperturValue == 0)
+                {
+                    ConsoleEx.WriteLineWithDate("Tempertur is 0, doing a HARD restart");
+                    Reboot.RebootCommand(conn);
+                }
+
                 SendSMS.SendSMSAsync(Tempertur.TemperturValue, conn, $"Restarted tempertur is {Tempertur.TemperturValue}");
+
+
+                
 
                 while (!Console.KeyAvailable)
                 {
