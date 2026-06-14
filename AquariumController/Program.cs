@@ -36,6 +36,9 @@ namespace AquariumController
             ConsoleEx.WriteLineWithDate("Setting up Heater....");
             cooler = new Cooler(conn);
 
+            ConsoleEx.WriteLineWithDate("Setting up Pumper....");
+            Pumper pumper = new Pumper(conn);
+
             Timer saveTemperturTimer = Settings.SetupSaveInterval(conn, "TemperatureSaveInterval", Tempertur.SaveTempertur);
 
             //read setting every 5 minute.
@@ -133,6 +136,8 @@ namespace AquariumController
                         console.ReplaceLine(0, tempterturText );
 
                         Animation.ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
+
+                        pumper.CheckPumperState(conn);
 
                         //Blink display if tempertur is over max tempertur
                         if (roundTemp  > Tempertur.TemperatureMax + 0.2)
