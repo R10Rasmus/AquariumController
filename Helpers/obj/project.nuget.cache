@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "aZarZkCGXRY=",
+  "dgSpecHash": "suAl7frtA44=",
   "success": true,
-  "projectFilePath": "C:\\Users\\rasmu\\OneDrive\\Projekter\\PI\\c#\\AquariumController\\Helpers\\Helpers.csproj",
+  "projectFilePath": "C:\\Privat kode\\Helpers\\Helpers.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\rasmu\\.nuget\\packages\\bouncycastle.cryptography\\2.3.1\\bouncycastle.cryptography.2.3.1.nupkg.sha512",
     "C:\\Users\\rasmu\\.nuget\\packages\\google.protobuf\\3.26.1\\google.protobuf.3.26.1.nupkg.sha512",

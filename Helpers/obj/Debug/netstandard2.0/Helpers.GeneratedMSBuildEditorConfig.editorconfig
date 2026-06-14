@@ -1,6 +1,6 @@
 is_global = true
 build_property.RootNamespace = Helpers
-build_property.ProjectDir = C:\Users\rasmu\OneDrive\Projekter\PI\c#\AquariumController\Helpers\
+build_property.ProjectDir = C:\Privat kode\Helpers\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.CsWinRTUseWindowsUIXamlProjections = false
