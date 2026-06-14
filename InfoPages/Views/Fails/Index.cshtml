@@ -1,0 +1,64 @@
+﻿@using InfoPages.Models
+@model IEnumerable<Fails>
+
+@{
+    ViewBag.Title = "Fails";
+}
+
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.ActionLink("Created", "Index", new { sortOrder = ViewBag.SortOrder, page = ViewBag.CurrentPage })
+            @if (ViewBag.IsDescending)
+            {
+                <span>&#9660; <!-- Down arrow for descending --></span>
+            }
+            else
+            {
+                <span>&#9650; <!-- Up arrow for ascending --></span>
+            }
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Message)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StackTrace)
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Created)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Message)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StackTrace)
+            </td>
+        </tr>
+    }
+</table>
+
+<div>
+    @if (ViewBag.CurrentPage > 1)
+    {
+        <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1, sortOrder = ViewBag.SortOrder })">Previous</a>
+    }
+
+    Page @ViewBag.CurrentPage of @ViewBag.TotalPages
+
+    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+    {
+        <a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1, sortOrder = ViewBag.SortOrder })">Next</a>
+    }
+</div>
+<br>
+<form method="post" action="@Url.Action("DeleteAll", "Fails")" onsubmit="return confirm('Are you sure you want to delete all records?');">
+    <button type="submit" class="btn btn-danger">Delete All</button>
+</form>

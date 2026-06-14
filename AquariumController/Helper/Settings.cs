@@ -13,7 +13,7 @@ namespace AquariumController.Helper
         {
 
             // Create saver tempertur timer
-            int saveTemperturIntervaleInMin = int.Parse(DB.Helper.GetSettingFromDb(conn, SettingFromDb));
+            int saveTemperturIntervaleInMin = int.Parse(Helpers.DB.Helper.GetSettingFromDb(conn, SettingFromDb));
             ConsoleEx.WriteLineWithDate($"{SettingFromDb} is {saveTemperturIntervaleInMin}");
 
             AutoResetEvent saveAutoResetEvent = new AutoResetEvent(false);
@@ -28,10 +28,6 @@ namespace AquariumController.Helper
             localConn.Open();
 
             Tempertur.SetupMaxMinTemperature(localConn);
-
-            AirPump.SetupAirPumpStartStopTime(localConn);
-            AirPump.SetupAirPumpFeedingStop(localConn);
-
 
             localConn.Close();
             localConn.Dispose();

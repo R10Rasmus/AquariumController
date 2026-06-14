@@ -3,59 +3,50 @@ using AquariumController.Extension;
 using AquariumController.Helper;
 using Lcd1602Controller;
 using MySql.Data.MySqlClient;
+using Renci.SshNet.Messages;
 using System;
 using System.Configuration;
 using System.Device.Gpio;
-using System.Device.I2c;
+using System.IO;
+using System.Linq;
 using System.Threading;
+using UnitsNet;
 
 namespace AquariumController
 {
     class Program
     {
 
-        const int AIRPUMPPIN = 01;
+       // const int AIRPUMPPIN = 01;
 
         const int LCDRSPIN = 07;
         const int LCDENABLEPIN = 08;
         static readonly int[] LCDDATA = { 06, 13, 19, 26 };
-
-        const int BUSID = 1;
-        const int I2CADDRESS = 0x3F;
-
-        static GpioController _Controller;
-
         static void Main(string[] args)
         {
-            Heater heater = null;
+            Cooler cooler = null;
 
             ConsoleEx.WriteLineWithDate("AquariumController is running");
 
-            ConsoleEx.WriteLineWithDate("Setting up I2C...");
-            I2cConnectionSettings settings = new I2cConnectionSettings(BUSID, I2CADDRESS);
-            I2cDevice device = I2cDevice.Create(settings);
-
-            ConsoleEx.WriteLineWithDate("Setting up UFire EC Probe...");
-            Iot.Device.UFire.UFire_pH uFire_pH = new Iot.Device.UFire.UFire_pH(device);
-            uFire_pH.UseTemperatureCompensation(true);
 
             ConsoleEx.WriteLineWithDate("Setting up MySql db....");
             MySqlConnection conn = new MySqlConnection(ConfigurationManager.AppSettings.Get("ConnectionString"));
             conn.Open();
 
             ConsoleEx.WriteLineWithDate("Setting up Heater....");
-            heater = new Heater(conn);
+            cooler = new Cooler(conn);
 
             Timer saveTemperturTimer = Settings.SetupSaveInterval(conn, "TemperatureSaveInterval", Tempertur.SaveTempertur);
-            Timer savePhTimer = Settings.SetupSaveInterval(conn, "PHSaveInterval", Ph.SavePh);
 
             //read setting every 5 minute.
             AutoResetEvent saveTemperturAutoResetEvent = new AutoResetEvent(false);
             Timer readSetupTimer = new Timer(Settings.ReadSetup, saveTemperturAutoResetEvent, 0, 5 * 60 * 1000);
 
-            ConsoleEx.WriteLineWithDate("Setting up GpioController....");
-            _Controller = new GpioController();
-            _Controller.OpenPin(AIRPUMPPIN, PinMode.Output);
+            ConsoleEx.WriteLineWithDate("Getting devices...");
+
+            var directories = Tempertur.GetDirectories();
+
+            ConsoleEx.WriteLineWithDate($"Found {directories.Count()} devices");
 
             ConsoleEx.WriteLineWithDate("Setting up Lcd1602....");
             using (Lcd1602 lcd = new Lcd1602(registerSelectPin: LCDRSPIN, enablePin: LCDENABLEPIN, dataPins: LCDDATA, shouldDispose: true))
@@ -75,40 +66,86 @@ namespace AquariumController
                 bool _revers = false;
                 int _positionCount = 0;
 
+                var temperatur = Tempertur.ReadTemperatur(directories);
+                Tempertur.TemperturValue = temperatur.FirstOrDefault();
+
+                if (Tempertur.TemperturValue == 0)
+                {
+                    ConsoleEx.WriteLineWithDate("Tempertur is 0, doing a HARD restart");
+                    Reboot.RebootCommand(conn);
+                }
+
+                SendSMS.SendSMSAsync(Tempertur.TemperturValue, conn, $"Restarted tempertur is {Tempertur.TemperturValue}");
+
+
+                
+
                 while (!Console.KeyAvailable)
                 {
                     try
                     {
 
-                        Tempertur.TemperturValue = Convert.ToDouble(uFire_pH.MeasureTemp()) + Tempertur.TemperturCalibrateOffSet;
+                        temperatur = Tempertur.ReadTemperatur(directories);
+                        Tempertur.TemperturValue = temperatur.FirstOrDefault();
 
-                        Ph.PH = Math.Round(uFire_pH.MeasurepH(), 1);
+                        if(Tempertur.TemperturValue == 0)
+                        {
+                            ConsoleEx.WriteLineWithDate("Tempertur is 0, trying to read again");
+                            Thread.Sleep(1000); // wait 1 sec
+                            directories = Tempertur.GetDirectories();
+                            temperatur = Tempertur.ReadTemperatur(directories);
+                            Tempertur.TemperturValue = temperatur.FirstOrDefault();
+                        }
+                        string tempterturText =string.Empty;
+                        double roundTemp = 0;
+                        if (Tempertur.TemperturValue != 0)
+                        {
 
-                        string tempterturText = Math.Round(Tempertur.TemperturValue, 1, MidpointRounding.AwayFromZero).ToString() + (char)SetCharacters.TemperatureCharactersNumber;
+                            //if tempertur is over 26.35 or under 25,8 send sms
+                            if (Tempertur.TemperturValue > 26.35 || (Tempertur.TemperturValue < 25.8))
+                            {
 
-                        string pHText = Ph.PH + "pH";
+                                if (Tempertur.TemperturValue > 26.35)
+                                    SendSMS.SendSMSAsync(Tempertur.TemperturValue, conn, $"Tempertur is to highe Tempertur {Tempertur.TemperturValue}");
+                                else
+                                    SendSMS.SendSMSAsync(Tempertur.TemperturValue, conn, $"Tempertur is to low Tempertur {Tempertur.TemperturValue}");
+                            }
+                            if (Tempertur.TemperturValue > 27)
+                            {
+                                SendSMS.SendSMSAsync(Tempertur.TemperturValue, conn, $"ALARM!! Temperature is WAY too high.{Tempertur.TemperturValue}", true);
+                            }
 
-                        console.ReplaceLine(0, tempterturText + " " + pHText);
+                            Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);
+                            cooler.CoolerOnOff(conn);
+
+                            roundTemp = Math.Round(Tempertur.TemperturValue, 2, MidpointRounding.AwayFromZero);
+
+                            tempterturText = roundTemp.ToString() + (char)SetCharacters.TemperatureCharactersNumber;
+                        }
+                        else
+                        {
+                            ConsoleEx.WriteLineWithDate("Tempertur is still 0, trying to read again");
+                            tempterturText = "ERROR! Could not read tempertur, trying again...";
+
+                            roundTemp = Tempertur.TemperatureMax + 0.2;
+
+                        }
+                        console.ReplaceLine(0, tempterturText );
 
                         Animation.ShowFishOnLine2(console, ref _fishCount, ref _revers, ref _positionCount);
 
-                        Heater.SetHeaterControlOnOff(conn, Tempertur.TemperturValue);
-                        heater.HeaterOnOff(conn);
-
                         //Blink display if tempertur is over max tempertur
-                        if (Tempertur.TemperturValue > Tempertur.TemperatureMax)
+                        if (roundTemp  > Tempertur.TemperatureMax + 0.2)
                         {
                             console.BlinkDisplay(1);
                         }
 
-
-                        AirPump.AirPumpOnOff(conn, _Controller, AIRPUMPPIN);
-
                     }
-#pragma warning disable CA1031 // Do not catch general exception types
                     catch (Exception ex)
                     {
+                        console.ReplaceLine(0, "ERROR! Check tempertur and restart");
                         ConsoleEx.WriteLineWithDate("Got an error: " + ex.Message + "StackTrace: " + ex.StackTrace);
+                        Fails.SaveFail(ex);
                         if (ex.InnerException != null)
                         {
                             ConsoleEx.WriteLineWithDate("Error InnerException: " + ex.InnerException.Message);
@@ -119,7 +156,6 @@ namespace AquariumController
                     {
                         Thread.Sleep(1000);
                     }
-#pragma warning restore CA1031 // Do not catch general exception types
 
                 }
 
@@ -128,14 +164,10 @@ namespace AquariumController
             }
 
             saveTemperturTimer.Dispose();
-            savePhTimer.Dispose();
             readSetupTimer.Dispose();
 
             conn.Close();
             conn.Dispose();
-
-            _Controller.Dispose();
-
 
         }
 
