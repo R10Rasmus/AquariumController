@@ -14,6 +14,11 @@ namespace AquariumController.Helper
         private static readonly TimeSpan _pollInterval = TimeSpan.FromSeconds(5);
         private DateTime _lastPoll = DateTime.MinValue;
 
+        //warn by SMS if the pump stays off for longer than this (no circulation is critical)
+        private static readonly TimeSpan _offWarningThreshold = TimeSpan.FromMinutes(6);
+        private DateTime? _offSince = null;
+        private bool _offWarningSent = false;
+
         private readonly ILocalHueClient client;
         private readonly string pumperId;
         private bool? _lastState = null;
@@ -74,16 +79,44 @@ namespace AquariumController.Helper
             if (_lastState == null)
             {
                 _lastState = currentState;
-                return;
             }
-
-            if (_lastState.Value != currentState)
+            else if (_lastState.Value != currentState)
             {
                 Helpers.DB.Helper.SavePumperStateChange(conn, _lastState.Value, currentState);
 
                 ConsoleEx.WriteLineWithDate($"Pumper changed from {(_lastState.Value ? "on" : "off")} to {(currentState ? "on" : "off")}");
 
                 _lastState = currentState;
+            }
+
+            CheckOffDurationWarning(conn, currentState);
+        }
+
+        //Send a single SMS warning if the pump stays off longer than the threshold. Reset when it turns back on.
+        private void CheckOffDurationWarning(MySqlConnection conn, bool currentState)
+        {
+            if (currentState)
+            {
+                _offSince = null;
+                _offWarningSent = false;
+                return;
+            }
+
+            if (_offSince == null)
+            {
+                _offSince = DateTime.Now;
+            }
+
+            if (!_offWarningSent && DateTime.Now - _offSince.Value > _offWarningThreshold)
+            {
+                _offWarningSent = true;
+
+                int minutes = (int)Math.Round((DateTime.Now - _offSince.Value).TotalMinutes);
+                ConsoleEx.WriteLineWithDate($"Pumper has been off for {minutes} min, sending SMS warning!");
+
+                //fire-and-forget like the temperature alarms; alarm=true bypasses the shared 2h SMS
+                //cooldown so the warning is actually delivered. Only called once per off-episode.
+                SendSMS.SendSMSAsync(0, conn, $"WARNING: Pumper has been off for more than {minutes} min!", true);
             }
         }
     }

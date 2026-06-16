@@ -67,6 +67,25 @@
 
 <div class="col-md-12">
     <div class="row">
+        <div id="chartTemperatureContainer" style="width:100%;height:410px"></div>
+    </div>
+    <div class="row">
+        <div id="statusContainer" class="col-md-12" style="margin-top: 20px;">
+            <h3>Status</h3>
+            <div id="fanStatusContainer" class="status-indicator">
+                <div id="fanHueStatus" class="status-half"></div>
+                <div id="fanStatus" class="status-half"></div>
+            </div>
+            <div id="coolerStatusContainer" class="status-indicator">
+                <div id="coolerHueStatus" class="status-half"></div>
+                <div id="coolerStatus" class="status-half"></div>
+            </div>
+            <div id="pumperStatusContainer" class="status-indicator">
+                <div id="pumperHueStatus" class="status-half" style="width: 100%;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <h3>Pumper - last 5 state changes</h3>
         @if (Model.PumperStateChanges == null || Model.PumperStateChanges.Count == 0)
         {
@@ -92,25 +111,6 @@
                 }
             </table>
         }
-    </div>
-    <div class="row">
-        <div id="chartTemperatureContainer" style="width:100%;height:410px"></div>
-    </div>
-    <div class="row">
-        <div id="statusContainer" class="col-md-12" style="margin-top: 20px;">
-            <h3>Status</h3>
-            <div id="fanStatusContainer" class="status-indicator">
-                <div id="fanHueStatus" class="status-half"></div>
-                <div id="fanStatus" class="status-half"></div>
-            </div>
-            <div id="coolerStatusContainer" class="status-indicator">
-                <div id="coolerHueStatus" class="status-half"></div>
-                <div id="coolerStatus" class="status-half"></div>
-            </div>
-            <div id="pumperStatusContainer" class="status-indicator">
-                <div id="pumperHueStatus" class="status-half" style="width: 100%;"></div>
-            </div>
-        </div>
     </div>
 </div>
 
