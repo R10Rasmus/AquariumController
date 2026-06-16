@@ -207,6 +207,7 @@
     <Compile Include="Helper\Cooler.cs" />
     <Compile Include="Helper\Fails.cs" />
     <Compile Include="Helper\Ph.cs" />
+    <Compile Include="Helper\Pumper.cs" />
     <Compile Include="Helper\Settings.cs" />
     <Compile Include="Helper\Tempertur.cs" />
     <Compile Include="Models\ScheduleCorrect.cs" />

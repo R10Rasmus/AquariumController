@@ -20,3 +20,14 @@ C:\Users\rasmu\OneDrive\Projekter\PI\c#\AquariumController\Helpers\obj\Debug\net
 C:\Users\rasmu\OneDrive\Projekter\PI\c#\AquariumController\Helpers\obj\Debug\netstandard2.0\Helpers.sourcelink.json
 C:\Users\rasmu\OneDrive\Projekter\PI\c#\AquariumController\Helpers\obj\Debug\netstandard2.0\Helpers.dll
 C:\Users\rasmu\OneDrive\Projekter\PI\c#\AquariumController\Helpers\obj\Debug\netstandard2.0\Helpers.pdb
+C:\Privat kode\Helpers\bin\Debug\netstandard2.0\Helpers.deps.json
+C:\Privat kode\Helpers\bin\Debug\netstandard2.0\Helpers.dll
+C:\Privat kode\Helpers\bin\Debug\netstandard2.0\Helpers.pdb
+C:\Privat kode\Helpers\obj\Debug\netstandard2.0\Helpers.csproj.AssemblyReference.cache
+C:\Privat kode\Helpers\obj\Debug\netstandard2.0\Helpers.GeneratedMSBuildEditorConfig.editorconfig
+C:\Privat kode\Helpers\obj\Debug\netstandard2.0\Helpers.AssemblyInfoInputs.cache
+C:\Privat kode\Helpers\obj\Debug\netstandard2.0\Helpers.AssemblyInfo.cs
+C:\Privat kode\Helpers\obj\Debug\netstandard2.0\Helpers.csproj.CoreCompileInputs.cache
+C:\Privat kode\Helpers\obj\Debug\netstandard2.0\Helpers.sourcelink.json
+C:\Privat kode\Helpers\obj\Debug\netstandard2.0\Helpers.dll
+C:\Privat kode\Helpers\obj\Debug\netstandard2.0\Helpers.pdb

@@ -1,5 +1,5 @@
 ﻿@using InfoPages.Models
-@model Graph
+@model DashboardViewModel
 
 @{
     ViewBag.Title = "Dashboard";
@@ -25,19 +25,20 @@
                 },
                 axisX: {
                     valueFormatString: "HH:mm",
-                    labelAngle: -50
+                    labelAngle: -50,
+                    stripLines: []
                 },
                 axisY: {
                     stripLines: [
                         {
-                            value: @Model.Max,
+                            value: @Model.Graph.Max,
                             color: "red"
                         }, {
-                            value: @Model.Min,
+                            value: @Model.Graph.Min,
                             color: "red"
                         }],
-                      minimum: @(Model.Min - 1),
-                      maximum:@(Model.Max + 1),
+                      minimum: @(Model.Graph.Min - 1),
+                      maximum:@(Model.Graph.Max + 1),
                     valueFormatString: "##.0"
                 },
                 title: {
@@ -50,7 +51,14 @@
                 }]
             });
 
+            var coolerStripLines = [];
+            var showCoolerEvents = document.getElementById("showCoolerEvents");
+            if (showCoolerEvents) {
+                showCoolerEvents.addEventListener("change", applyCoolerOverlay);
+            }
+
             $.getJSON("/home/TemperatureData?timeSpan=1", addDataTemperature);
+            $.getJSON("/home/CoolerEventsData?timeSpan=1", addCoolerEvents);
 
             function addDataTemperature(data) {
                 for (var i = 0; i < data.length; i++) {
@@ -61,11 +69,68 @@
                 }
                 temperatureChart.render();
             }
+
+            function addCoolerEvents(data) {
+                coolerStripLines = buildCoolerStripLines(data);
+                applyCoolerOverlay();
+            }
+
+            function applyCoolerOverlay() {
+                var show = showCoolerEvents ? showCoolerEvents.checked : false;
+                temperatureChart.options.axisX.stripLines = show ? coolerStripLines : [];
+                temperatureChart.render();
+            }
+
+            // Build shaded regions (on -> off periods) for fan and cooler from the event list.
+            function buildCoolerStripLines(events) {
+                var lines = [];
+                var open = {};
+                var colors = { fan: "rgba(0,120,255,0.15)", cooler: "rgba(255,60,60,0.15)" };
+                var labels = { fan: "Fan", cooler: "Cooler" };
+
+                for (var i = 0; i < events.length; i++) {
+                    var ev = events[i];
+                    var t = new Date(ev.CreatedAt);
+                    if (ev.State) {
+                        if (!open[ev.Channel]) {
+                            open[ev.Channel] = t;
+                        }
+                    } else if (open[ev.Channel]) {
+                        lines.push(coolerRegion(open[ev.Channel], t, ev.Channel, colors, labels));
+                        open[ev.Channel] = null;
+                    }
+                }
+
+                // a period still open at the end is drawn up to "now"
+                var now = new Date();
+                for (var ch in open) {
+                    if (open[ch]) {
+                        lines.push(coolerRegion(open[ch], now, ch, colors, labels));
+                    }
+                }
+                return lines;
+            }
+
+            function coolerRegion(start, end, channel, colors, labels) {
+                return {
+                    startValue: start,
+                    endValue: end,
+                    color: colors[channel] || "rgba(150,150,150,0.15)",
+                    label: labels[channel] || channel,
+                    labelFontColor: "#555",
+                    labelPlacement: "outside"
+                };
+            }
         }
     </script>
 </head>
 
 <div class="col-md-12">
+    <div class="row" style="margin: 10px 0;">
+        <label style="font-weight: normal;">
+            <input type="checkbox" id="showCoolerEvents" checked /> Vis fan/cooler på grafen
+        </label>
+    </div>
     <div class="row">
         <div id="chartTemperatureContainer" style="width:100%;height:410px"></div>
     </div>
@@ -80,7 +145,37 @@
                 <div id="coolerHueStatus" class="status-half"></div>
                 <div id="coolerStatus" class="status-half"></div>
             </div>
+            <div id="pumperStatusContainer" class="status-indicator">
+                <div id="pumperHueStatus" class="status-half" style="width: 100%;"></div>
+            </div>
         </div>
+    </div>
+    <div class="row">
+        <h3>Pumper - last 5 state changes</h3>
+        @if (Model.PumperStateChanges == null || Model.PumperStateChanges.Count == 0)
+        {
+            <p>No state changes registered yet.</p>
+        }
+        else
+        {
+            <table class="table">
+                <tr>
+                    <th>Time</th>
+                    <th>From</th>
+                    <th></th>
+                    <th>To</th>
+                </tr>
+                @foreach (var change in Model.PumperStateChanges)
+                {
+                    <tr>
+                        <td>@change.Timestamp.ToString("dd-MM-yyyy HH:mm:ss")</td>
+                        <td>@(change.FromState ? "On" : "Off")</td>
+                        <td>&rarr;</td>
+                        <td>@(change.ToState ? "On" : "Off")</td>
+                    </tr>
+                }
+            </table>
+        }
     </div>
 </div>
 
@@ -91,11 +186,13 @@
             var fanHueStatusColor = data.FanCoolerOnOffHue ? "green" : "red";
             var coolerStatusColor = data.ExtraCoolerOnOff ? "green" : "red";
             var coolerHueStatusColor = data.ExtraCoolerOnOffHue ? "green" : "red";
+            var pumperHueStatusColor = data.PumperOnOffHue ? "green" : "red";
 
             $("#fanStatus").css("background-color", fanStatusColor).text("Fan Status: " + (data.FanCoolerOnOff ? "On" : "Off"));
             $("#fanHueStatus").css("background-color", fanHueStatusColor).text("Fan Hue: " + (data.FanCoolerOnOffHue ? "On" : "Off"));
             $("#coolerStatus").css("background-color", coolerStatusColor).text("Cooler Status: " + (data.ExtraCoolerOnOff ? "On" : "Off"));
             $("#coolerHueStatus").css("background-color", coolerHueStatusColor).text("Cooler Hue: " + (data.ExtraCoolerOnOffHue ? "On" : "Off"));
+            $("#pumperHueStatus").css("background-color", pumperHueStatusColor).text("Pumper Hue: " + (data.PumperOnOffHue ? "On" : "Off"));
         });
     });
 </script>
@@ -123,6 +220,10 @@
     }
 
     #coolerStatusContainer {
+        clear: both;
+    }
+
+    #pumperStatusContainer {
         clear: both;
     }
 </style>

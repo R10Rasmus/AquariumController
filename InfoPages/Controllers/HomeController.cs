@@ -15,7 +15,11 @@ namespace InfoPages.Controllers
 
         public ActionResult Index()
         {
-            return View(ReadTemperatureValues());
+            return View(new DashboardViewModel
+            {
+                Graph = ReadTemperatureValues(),
+                PumperStateChanges = GetPumperStateChanges(5)
+            });
         }
 
 
@@ -102,6 +106,11 @@ namespace InfoPages.Controllers
             return View(new Graph() { TimeSpan = EnumTimeSpan.OneMonth });
         }
 
+        public ActionResult Pumper()
+        {
+            return View(GetPumperStateChanges(100));
+        }
+
         public ActionResult TemperatureData(EnumTimeSpan? timeSpan)
         {
 
@@ -116,6 +125,38 @@ namespace InfoPages.Controllers
             JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
             return Content(JsonConvert.SerializeObject(GetData(timeSpan, "ph"), _jsonSetting), "application/json");
 
+        }
+
+        public ActionResult CoolerEventsData(EnumTimeSpan? timeSpan)
+        {
+            List<object> events = new List<object>();
+
+            MySqlConnection conn = OpenConnection();
+            string where = GetWhereFromTimeSpan(timeSpan);
+
+            MySqlCommand cmd = new MySqlCommand
+            {
+                CommandText = "SELECT channel, state, created_at FROM cooler_state_changes" + where + " ORDER BY created_at ASC",
+                Connection = conn
+            };
+
+            MySqlDataReader rdr = cmd.ExecuteReader();
+
+            while (rdr.Read())
+            {
+                events.Add(new
+                {
+                    Channel = rdr["channel"].ToString(),
+                    State = Convert.ToInt32(rdr["state"]) == 1,
+                    CreatedAt = DateTime.Parse(rdr["created_at"].ToString())
+                });
+            }
+
+            rdr.Close();
+            conn.Close();
+
+            JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+            return Content(JsonConvert.SerializeObject(events, _jsonSetting), "application/json");
         }
         public ActionResult CPUTemperature()
         {
@@ -133,6 +174,36 @@ namespace InfoPages.Controllers
             MySqlConnection conn = new MySqlConnection(ConfigurationManager.ConnectionStrings["mysql"].ConnectionString);
             conn.Open();
             return conn;
+        }
+
+        private static List<PumperStateChange> GetPumperStateChanges(int count)
+        {
+            List<PumperStateChange> changes = new List<PumperStateChange>();
+
+            MySqlConnection conn = OpenConnection();
+
+            MySqlCommand cmd = new MySqlCommand
+            {
+                CommandText = "SELECT from_state, to_state, created_at FROM pumper_state_changes ORDER BY created_at DESC LIMIT " + count,
+                Connection = conn
+            };
+
+            MySqlDataReader rdr = cmd.ExecuteReader();
+
+            while (rdr.Read())
+            {
+                changes.Add(new PumperStateChange
+                {
+                    Timestamp = DateTime.Parse(rdr["created_at"].ToString()),
+                    FromState = Convert.ToInt32(rdr["from_state"]) == 1,
+                    ToState = Convert.ToInt32(rdr["to_state"]) == 1
+                });
+            }
+
+            rdr.Close();
+            conn.Close();
+
+            return changes;
         }
 
         private static Graph ReadTemperatureValues()
