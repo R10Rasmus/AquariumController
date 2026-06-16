@@ -107,6 +107,9 @@
                 <div id="coolerHueStatus" class="status-half"></div>
                 <div id="coolerStatus" class="status-half"></div>
             </div>
+            <div id="pumperStatusContainer" class="status-indicator">
+                <div id="pumperHueStatus" class="status-half" style="width: 100%;"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -118,11 +121,13 @@
             var fanHueStatusColor = data.FanCoolerOnOffHue ? "green" : "red";
             var coolerStatusColor = data.ExtraCoolerOnOff ? "green" : "red";
             var coolerHueStatusColor = data.ExtraCoolerOnOffHue ? "green" : "red";
+            var pumperHueStatusColor = data.PumperOnOffHue ? "green" : "red";
 
             $("#fanStatus").css("background-color", fanStatusColor).text("Fan Status: " + (data.FanCoolerOnOff ? "On" : "Off"));
             $("#fanHueStatus").css("background-color", fanHueStatusColor).text("Fan Hue: " + (data.FanCoolerOnOffHue ? "On" : "Off"));
             $("#coolerStatus").css("background-color", coolerStatusColor).text("Cooler Status: " + (data.ExtraCoolerOnOff ? "On" : "Off"));
             $("#coolerHueStatus").css("background-color", coolerHueStatusColor).text("Cooler Hue: " + (data.ExtraCoolerOnOffHue ? "On" : "Off"));
+            $("#pumperHueStatus").css("background-color", pumperHueStatusColor).text("Pumper Hue: " + (data.PumperOnOffHue ? "On" : "Off"));
         });
     });
 </script>
@@ -150,6 +155,10 @@
     }
 
     #coolerStatusContainer {
+        clear: both;
+    }
+
+    #pumperStatusContainer {
         clear: both;
     }
 </style>

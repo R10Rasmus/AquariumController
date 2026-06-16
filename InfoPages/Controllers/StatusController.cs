@@ -17,6 +17,7 @@ namespace InfoPages.Controllers
         private readonly ILocalHueClient client;
         private readonly Light aquariumFanCooler;
         private readonly Light aquariumExtraCooler;
+        private readonly Light aquariumPumper;
         public StatusController()
         {
             using (MySqlConnection conn = OpenConnection())
@@ -29,6 +30,7 @@ namespace InfoPages.Controllers
 
                 aquariumFanCooler = lights.FirstOrDefault(t => t.Name == Helpers.DB.Helper.GetSettingFromDb(conn, "FanCoolerName"));
                 aquariumExtraCooler = lights.FirstOrDefault(t => t.Name == Helpers.DB.Helper.GetSettingFromDb(conn, "ExtraCoolerName"));
+                aquariumPumper = lights.FirstOrDefault(t => t.Name == Helpers.DB.Helper.GetSettingFromDb(conn, "PumperName"));
             }
         }
         private MySqlConnection OpenConnection()
@@ -70,6 +72,8 @@ namespace InfoPages.Controllers
                 status.FanCoolerOnOffHue = aquariumFanCooler.State.On;
                 if(aquariumExtraCooler != null)
                     status.ExtraCoolerOnOffHue = aquariumExtraCooler.State.On;
+                if(aquariumPumper != null)
+                    status.PumperOnOffHue = aquariumPumper.State.On;
             }
 
             return Json(status, JsonRequestBehavior.AllowGet);
@@ -84,5 +88,7 @@ namespace InfoPages.Controllers
         public bool ExtraCoolerOnOff { get; set; }
 
         public bool ExtraCoolerOnOffHue { get; set; }
+
+        public bool PumperOnOffHue { get; set; }
     }
 }
