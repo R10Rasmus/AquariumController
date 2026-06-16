@@ -91,5 +91,16 @@ namespace Helpers.DB
             int rdr = cmd.ExecuteNonQuery();
         }
 
+        public static void SaveCoolerStateChange(MySqlConnection conn, string channel, bool state)
+        {
+            MySqlCommand cmd = new MySqlCommand
+            {
+                CommandText = "INSERT INTO cooler_state_changes (channel, state) VALUES ('" + channel + "', " + (state ? 1 : 0) + "); ",
+                Connection = conn
+            };
+
+            int rdr = cmd.ExecuteNonQuery();
+        }
+
     }
 }

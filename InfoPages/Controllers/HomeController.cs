@@ -126,6 +126,38 @@ namespace InfoPages.Controllers
             return Content(JsonConvert.SerializeObject(GetData(timeSpan, "ph"), _jsonSetting), "application/json");
 
         }
+
+        public ActionResult CoolerEventsData(EnumTimeSpan? timeSpan)
+        {
+            List<object> events = new List<object>();
+
+            MySqlConnection conn = OpenConnection();
+            string where = GetWhereFromTimeSpan(timeSpan);
+
+            MySqlCommand cmd = new MySqlCommand
+            {
+                CommandText = "SELECT channel, state, created_at FROM cooler_state_changes" + where + " ORDER BY created_at ASC",
+                Connection = conn
+            };
+
+            MySqlDataReader rdr = cmd.ExecuteReader();
+
+            while (rdr.Read())
+            {
+                events.Add(new
+                {
+                    Channel = rdr["channel"].ToString(),
+                    State = Convert.ToInt32(rdr["state"]) == 1,
+                    CreatedAt = DateTime.Parse(rdr["created_at"].ToString())
+                });
+            }
+
+            rdr.Close();
+            conn.Close();
+
+            JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+            return Content(JsonConvert.SerializeObject(events, _jsonSetting), "application/json");
+        }
         public ActionResult CPUTemperature()
         {
             double temperature = 0;
