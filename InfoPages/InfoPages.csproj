@@ -226,11 +226,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\DashboardViewModel.cs" />
     <Compile Include="Models\DataPoint.cs" />
     <Compile Include="Models\EnumTimeSpan.cs" />
     <Compile Include="Models\EventPoint.cs" />
     <Compile Include="Models\Graph.cs" />
     <Compile Include="Models\Fails.cs" />
+    <Compile Include="Models\PumperStateChange.cs" />
     <Compile Include="Models\Setting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -257,6 +259,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\EditSetting.cshtml" />
     <Content Include="Views\Home\PH.cshtml" />
+    <Content Include="Views\Home\Pumper.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
