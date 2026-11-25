@@ -13,6 +13,10 @@ namespace AquariumController.Helper
     {
         private static DateTime _lastturnOnOff = new DateTime();
 
+        //last on/off state we logged to the db, so we only record actual changes
+        private static bool? _lastFanLogged = null;
+        private static bool? _lastExtraLogged = null;
+
         private readonly ILocalHueClient client;
         private readonly string FanCoolerName;
         private readonly string ExtraCoolerName;
@@ -62,6 +66,7 @@ namespace AquariumController.Helper
             if (bool.TryParse(Helpers.DB.Helper.GetSettingFromDb(conn, "FanCoolerrOnOff"), out bool fanResult) && !string.IsNullOrEmpty(FanCoolerName))
             {
                 TurnFanCoolerOnOff(fanResult);
+                LogStateChange(conn, "fan", fanResult, ref _lastFanLogged);
             }
 
             //wait 0.5 sec before turning on/off extra cooler
@@ -70,8 +75,31 @@ namespace AquariumController.Helper
             if (bool.TryParse(Helpers.DB.Helper.GetSettingFromDb(conn, "ExtraCoolerOnOff"), out bool extraResult) && !string.IsNullOrEmpty(FanCoolerName))
             {
                 TurnExtraCoolerOnOff(extraResult);
+                LogStateChange(conn, "cooler", extraResult, ref _lastExtraLogged);
             }
 
+        }
+
+        //Record a fan/cooler on/off change to the db (for the temperature graph overlay).
+        //Logging failures must never disrupt the actual cooling, so swallow any error.
+        private static void LogStateChange(MySqlConnection conn, string channel, bool state, ref bool? lastLogged)
+        {
+            if (lastLogged == state)
+            {
+                return;
+            }
+
+#pragma warning disable CA1031 // Do not catch general exception types
+            try
+            {
+                Helpers.DB.Helper.SaveCoolerStateChange(conn, channel, state);
+                lastLogged = state;
+            }
+            catch (Exception ex)
+            {
+                ConsoleEx.WriteLineWithDate($"Could not log {channel} state change: {ex.Message} (Did you run db/cooler_state_changes.sql?)");
+            }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         public static void SetCoolerControlOnOff(MySqlConnection conn, double _temperature)

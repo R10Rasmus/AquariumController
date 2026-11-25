@@ -1,0 +1,33 @@
+@using InfoPages.Models
+@model IEnumerable<PumperStateChange>
+
+@{
+    ViewBag.Title = "Pumper";
+}
+<h2>@ViewBag.Title</h2>
+<h3>State changes</h3>
+
+@if (Model == null || !Model.Any())
+{
+    <p>No state changes registered yet.</p>
+}
+else
+{
+    <table class="table">
+        <tr>
+            <th>Time</th>
+            <th>From</th>
+            <th></th>
+            <th>To</th>
+        </tr>
+        @foreach (var change in Model)
+        {
+            <tr>
+                <td>@change.Timestamp.ToString("dd-MM-yyyy HH:mm:ss")</td>
+                <td>@(change.FromState ? "On" : "Off")</td>
+                <td>&rarr;</td>
+                <td>@(change.ToState ? "On" : "Off")</td>
+            </tr>
+        }
+    </table>
+}

@@ -80,5 +80,27 @@ namespace Helpers.DB
             return value;
         }
 
+        public static void SavePumperStateChange(MySqlConnection conn, bool fromState, bool toState)
+        {
+            MySqlCommand cmd = new MySqlCommand
+            {
+                CommandText = "INSERT INTO pumper_state_changes (from_state, to_state) VALUES (" + (fromState ? 1 : 0) + ", " + (toState ? 1 : 0) + "); ",
+                Connection = conn
+            };
+
+            int rdr = cmd.ExecuteNonQuery();
+        }
+
+        public static void SaveCoolerStateChange(MySqlConnection conn, string channel, bool state)
+        {
+            MySqlCommand cmd = new MySqlCommand
+            {
+                CommandText = "INSERT INTO cooler_state_changes (channel, state) VALUES ('" + channel + "', " + (state ? 1 : 0) + "); ",
+                Connection = conn
+            };
+
+            int rdr = cmd.ExecuteNonQuery();
+        }
+
     }
 }
