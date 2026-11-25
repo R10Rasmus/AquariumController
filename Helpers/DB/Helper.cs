@@ -23,6 +23,29 @@ namespace Helpers.DB
             return value;
         }
 
+        /// <summary>
+        /// Same as GetSettingFromDb, but returns null if the setting does not exist.
+        /// </summary>
+        public static string TryGetSettingFromDb(MySqlConnection conn, string settingName)
+        {
+            using (MySqlCommand cmd = new MySqlCommand("SELECT value FROM settings WHERE title = @title", conn))
+            {
+                cmd.Parameters.AddWithValue("@title", settingName);
+                object value = cmd.ExecuteScalar();
+                return value == null || value == System.DBNull.Value ? null : value.ToString();
+            }
+        }
+
+        public static void SaveEvent(MySqlConnection conn, string type, double value)
+        {
+            using (MySqlCommand cmd = new MySqlCommand("INSERT INTO events (type, value) VALUES (@type, @value)", conn))
+            {
+                cmd.Parameters.AddWithValue("@type", type);
+                cmd.Parameters.AddWithValue("@value", value);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public static void SaveChannelValue(MySqlConnection conn, string channelName, double value)
         {
 

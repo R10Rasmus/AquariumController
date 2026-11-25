@@ -50,15 +50,36 @@
                 }]
             });
 
-            $.getJSON("/home/TemperatureData?timeSpan=1", addDataTemperature);
+            $.when(
+                $.getJSON("/home/TemperatureData?timeSpan=1"),
+                $.getJSON("/home/EventsData?timeSpan=1")
+            ).done(function (temperatureResult, eventsResult) {
+                addDataTemperature(temperatureResult[0], eventsResult[0]);
+            });
 
-            function addDataTemperature(data) {
+            function addDataTemperature(data, events) {
                 for (var i = 0; i < data.length; i++) {
                     TemperatureDps.push({
                         x: new Date(data[i].X),
                         y: data[i].Y
                     });
                 }
+
+                // Show events (fx. AOT runs) as vertical lines on the graph
+                var stripLines = [];
+                for (var j = 0; j < events.length; j++) {
+                    stripLines.push({
+                        value: new Date(events[j].X),
+                        label: events[j].Type === "AOT" ? "AOT kørte" : events[j].Type,
+                        labelFontColor: "#d9822b",
+                        labelPlacement: "outside",
+                        color: "#d9822b",
+                        lineDashType: "dash",
+                        thickness: 1
+                    });
+                }
+                temperatureChart.options.axisX.stripLines = stripLines;
+
                 temperatureChart.render();
             }
         }

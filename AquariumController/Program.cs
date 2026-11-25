@@ -75,8 +75,13 @@ namespace AquariumController
                     Reboot.RebootCommand(conn);
                 }
 
-                SendSMS.SendSMSAsync(Tempertur.TemperturValue, conn, $"Restarted tempertur is {Tempertur.TemperturValue}");
+                ConsoleEx.WriteLineWithDate($"Started, tempertur is {Tempertur.TemperturValue}");
 
+                // Time when the temperature first went over the high limit (null = not too high)
+                DateTime? tooHighSince = null;
+                TimeSpan tooHighDelay = TimeSpan.FromMinutes(5);
+
+                AotDetector aotDetector = new AotDetector(conn);
 
                 
 
@@ -101,13 +106,26 @@ namespace AquariumController
                         if (Tempertur.TemperturValue != 0)
                         {
 
-                            //if tempertur is over 26.35 or under 25,8 send sms
-                            if (Tempertur.TemperturValue > 26.35 || (Tempertur.TemperturValue < 25.8))
+                            //if tempertur has been over 26.35 for more than 5 min send sms
+                            //(it can briefly get warmer when new water is added)
+                            if (Tempertur.TemperturValue > 26.35)
                             {
-
-                                if (Tempertur.TemperturValue > 26.35)
+                                if (!tooHighSince.HasValue)
+                                {
+                                    tooHighSince = DateTime.Now;
+                                    ConsoleEx.WriteLineWithDate($"Tempertur {Tempertur.TemperturValue} is over 26.35, waiting {tooHighDelay.TotalMinutes} min before sending sms");
+                                }
+                                else if (DateTime.Now - tooHighSince.Value >= tooHighDelay)
+                                {
                                     SendSMS.SendSMSAsync(Tempertur.TemperturValue, conn, $"Tempertur is to highe Tempertur {Tempertur.TemperturValue}");
-                                else
+                                }
+                            }
+                            else
+                            {
+                                tooHighSince = null;
+
+                                //if tempertur is under 25,8 send sms
+                                if (Tempertur.TemperturValue < 25.8)
                                     SendSMS.SendSMSAsync(Tempertur.TemperturValue, conn, $"Tempertur is to low Tempertur {Tempertur.TemperturValue}");
                             }
                             if (Tempertur.TemperturValue > 27)
@@ -117,6 +135,8 @@ namespace AquariumController
 
                             Cooler.SetCoolerControlOnOff(conn, Tempertur.TemperturValue);
                             cooler.CoolerOnOff(conn);
+
+                            aotDetector.AddReading(conn, Tempertur.TemperturValue);
 
                             roundTemp = Math.Round(Tempertur.TemperturValue, 2, MidpointRounding.AwayFromZero);
 

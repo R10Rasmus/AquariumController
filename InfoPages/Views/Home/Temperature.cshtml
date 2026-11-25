@@ -56,11 +56,20 @@
             }]
               });
 
-            $.getJSON("/home/TemperatureData?timeSpan=@((int) Model.TimeSpan)", addData);
+            loadData(@((int) Model.TimeSpan));
 
         }
 
-        function addData(data) {
+        function loadData(timeSpan) {
+            $.when(
+                $.getJSON("/home/TemperatureData?timeSpan=" + timeSpan),
+                $.getJSON("/home/EventsData?timeSpan=" + timeSpan)
+            ).done(function (temperatureResult, eventsResult) {
+                addData(temperatureResult[0], eventsResult[0]);
+            });
+        }
+
+        function addData(data, events) {
             dps.length = 0;
             for (var i = 0; i < data.length; i++) {
                 dps.push({
@@ -68,11 +77,29 @@
                     y: data[i].Y
                 });
             }
+            chart.options.axisX.stripLines = toEventStripLines(events);
             chart.render();
         }
 
+        // Show events (fx. AOT runs) as vertical lines on the graph
+        function toEventStripLines(events) {
+            var stripLines = [];
+            for (var i = 0; i < events.length; i++) {
+                stripLines.push({
+                    value: new Date(events[i].X),
+                    label: events[i].Type === "AOT" ? "AOT kørte" : events[i].Type,
+                    labelFontColor: "#d9822b",
+                    labelPlacement: "outside",
+                    color: "#d9822b",
+                    lineDashType: "dash",
+                    thickness: 1
+                });
+            }
+            return stripLines;
+        }
+
         function callChangefunc(val) {
-            $.getJSON("/home/TemperatureData?timeSpan=" + val, addData);
+            loadData(val);
         }
 
     </script>
