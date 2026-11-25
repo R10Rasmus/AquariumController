@@ -23,6 +23,14 @@ namespace AquariumController.Helper
         private static readonly TimeSpan _cooldown = TimeSpan.FromMinutes(2);
         private static DateTime _lastSent = DateTime.MinValue;
 
+        private bool? _fanCoolerOn = null;
+        private bool? _extraCoolerOn = null;
+
+        /// <summary>
+        /// Last time (UTC) the fan cooler or the extra cooler actually changed between on and off.
+        /// </summary>
+        public static DateTime LastStateChangeUtc { get; private set; } = DateTime.MinValue;
+
         public Cooler(MySqlConnection conn)
         {
             ConsoleEx.WriteLineWithDate($"Getting PhilipsHue Lights...");
@@ -152,6 +160,12 @@ namespace AquariumController.Helper
             LightCommand lightCommand = new LightCommand() { On = on };
             client.SendCommandAsync(lightCommand, new List<string> { light.Id });
 
+            if (_fanCoolerOn != on)
+            {
+                _fanCoolerOn = on;
+                LastStateChangeUtc = DateTime.UtcNow;
+            }
+
             ConsoleEx.WriteLineWithDate($"Fan Cooler {(on ? "on" : "off")}!");
         }
 
@@ -166,6 +180,12 @@ namespace AquariumController.Helper
             }
             LightCommand lightCommand = new LightCommand() { On = on };
             client.SendCommandAsync(lightCommand, new List<string> { light.Id });
+
+            if (_extraCoolerOn != on)
+            {
+                _extraCoolerOn = on;
+                LastStateChangeUtc = DateTime.UtcNow;
+            }
 
             ConsoleEx.WriteLineWithDate($"Extra Cooler {(on ? "on" : "off")}!");
 

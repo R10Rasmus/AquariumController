@@ -126,6 +126,12 @@ namespace InfoPages.Controllers
             return Content(JsonConvert.SerializeObject(GetData(timeSpan, "ph"), _jsonSetting), "application/json");
 
         }
+        public ActionResult EventsData(EnumTimeSpan? timeSpan)
+        {
+            JsonSerializerSettings _jsonSetting = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore };
+            return Content(JsonConvert.SerializeObject(GetEvents(timeSpan), _jsonSetting), "application/json");
+        }
+
 
         public ActionResult CoolerEventsData(EnumTimeSpan? timeSpan)
         {
@@ -269,6 +275,40 @@ namespace InfoPages.Controllers
             }
 
             return where;
+        }
+
+        private static List<EventPoint> GetEvents(EnumTimeSpan? timeSpan)
+        {
+            List<EventPoint> events = new List<EventPoint>();
+
+            MySqlConnection conn = OpenConnection();
+            try
+            {
+                MySqlCommand cmd = new MySqlCommand
+                {
+                    CommandText = "SELECT type, value, created_at FROM events" + GetWhereFromTimeSpan(timeSpan) + " ORDER BY created_at",
+                    Connection = conn
+                };
+
+                using (MySqlDataReader rdr = cmd.ExecuteReader())
+                {
+                    while (rdr.Read())
+                    {
+                        double? value = rdr["value"] == DBNull.Value ? (double?)null : Convert.ToDouble(rdr["value"]);
+                        events.Add(new EventPoint(DateTime.Parse(rdr["created_at"].ToString()), rdr["type"].ToString(), value));
+                    }
+                }
+            }
+            catch (MySqlException)
+            {
+                // The events table does not exist yet (run db/aot-events.sql), show the graph without events
+            }
+            finally
+            {
+                conn.Close();
+            }
+
+            return events;
         }
 
         private static List<DataPoint> GetData(EnumTimeSpan? timeSpan, string tableName)
